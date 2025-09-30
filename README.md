@@ -1,4 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/DHwsEijt)
 <h2>Super Scrum Bros</h2>
 
 <h4>Team Members:</h4>
@@ -8,6 +7,8 @@
 <li>Nkono Andrew Mwase</li>
 <li>Spencer Davis</li>
 </ul>
+
+📄 For full-stack implementation details and API docs, see [project_202/README.md](./project_202/README.md)
 
 <h4>Summary of Areas of Contributions</h4>
 
