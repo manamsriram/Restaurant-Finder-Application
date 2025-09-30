@@ -187,7 +187,3 @@ Nkono Andrew Mwase  - [GitHub](https://github.com/NkonoAndrew)
 Spencer Davis  - [GitHub](https://github.com/sdavis5)
 
 ---
-
-## 📜 License
-
-MIT License. See [`LICENSE`](LICENSE).
