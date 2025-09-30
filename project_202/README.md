@@ -3,114 +3,191 @@
 [![React](https://img.shields.io/badge/React-18.3-blue?logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-purple?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?logo=tailwindcss)](https://tailwindcss.com/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES2023-F7DF1E?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-05998B?logo=fastapi)](https://fastapi.tiangolo.com)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-744A3F?logo=python)](https://sqlalchemy.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
-> **A modern, fast, and minimal web app to find restaurants using React, TailwindCSS, and Vite.**  
-> Features blazing fast development, modular UI, and scalable frontend patterns.
+> **A full-stack, blazing-fast restaurant discovery app built with React, TailwindCSS, Vite (frontend) and FastAPI/SQLAlchemy (backend/Python).**  
+> Find, browse, and manage restaurants with a modular codebase, RESTful API, and rapid development experience.
 
 ---
 
 ## 🔥 Overview
 
-This project provides an intuitive and responsive application for discovering restaurants—built with the latest frontend technologies.
-
-- **Built with React 18**
-- **Development with Vite** for lightning-fast HMR and build speed
-- **TailwindCSS** for utility-first, modern styling
-- **Modular source structure** under `/src` and `/routes`
-- **Custom ESLint & config files** for developer productivity
+- **React 18 SPA** with component-based UI, fast routing, and instant HMR via Vite.
+- **TailwindCSS** for modern, responsive design.
+- **FastAPI** REST backend in Python, serving authentication, CRUD, and business logic.
+- **SQLAlchemy** for robust data modeling and ORM.
+- **Development-first structure:** Modular file/folder organization for scale, testability, and ease of contribution.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| ![React](https://img.shields.io/badge/-React-61DAFB?logo=react) | ![Vite](https://img.shields.io/badge/-Vite-646CFF?logo=vite) | ![TailwindCSS](https://img.shields.io/badge/-Tailwind-38B2AC?logo=tailwindcss) | ![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?logo=javascript) |
-|:--:|:--:|:--:|:--:|
+| React | Vite | TailwindCSS | Python | FastAPI | SQLAlchemy | JavaScript |
+|:-----:|:----:|:-----------:|:------:|:--------:|:----------:|:----------:|
 
 ---
 
 ## 📦 Installation
 
-
 git clone https://github.com/manamsriram/Restaurant-Finder-Application.git
 cd Restaurant-Finder-Application/project_202
 
+Frontend
 npm install
 
+Backend
+cd routes
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+text
 
 ---
 
 ## 🖥️ Usage
 
-- **Development:**  
-  
-  npm run dev
-  
-  Opens app on `localhost:5173` (or as shown in your CLI).
+**Frontend (React/Vite):**
+npm run dev # Start development server
+npm run build # Production build
+npm run preview # Preview build
 
-- **Build:**
+text
 
-  npm run build
+**Backend (FastAPI):**
+uvicorn main:app --reload
 
-- **Preview Production:**
+text
 
-  npm run preview
+API by default on `localhost:8000`.  
+Point frontend API calls to backend server URL.
 
 ---
 
 ## 📂 Main Features
 
-- **Find restaurants easily:** Search and browse UI ready for custom backend/API integration
-- **Responsive layout:** Mobile-friendly, utility-based styling with TailwindCSS
-- **Fast build & reload:** Enjoy instant changes with Vite's Hot Module Replacement (HMR)
-- **Linting for code quality:** ESLint rules and configuration provided
-- **Extensible architecture:** Organize your logic under `/routes` and `/src` for scale
+- Mobile-first restaurant search, filtering, and browsing
+- Modular RESTful API for restaurants, users, owners, admins
+- JWT authentication and protected backend routes
+- Owner/admin dashboards and CRUD
+- Organized, extensible folders and code
 
 ---
 
 ## 🗂️ Directory Structure
 
+<pre>
 project_202/
 ├── routes/
+│   ├── routers/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── owners.py
+│   │   ├── restaurants.py
+│   │   ├── users.py
+│   │   └── __pycache__/
+│   ├── __init__.py
+│   ├── auth.py
+│   ├── db_config.py     # Database setup and connection
+│   ├── main.py          # FastAPI server entry-point, includes all routers
+│   ├── models.py        # ORM models for DB tables (restaurants, users, etc.)
+│   ├── requirements.txt # Backend dependencies (FastAPI, SQLAlchemy)
+│   ├── schemas.py       # Pydantic schemas for validation/serialization
 ├── src/
-├── index.html
-├── package.json
-├── requirements.txt
-├── tailwind.config.js
-├── postcss.config.js
-├── vite.config.js
-├── eslint.config.js
+│   ├── components/      # React UI components
+│   ├── pages/           # High-level page views/routes
+│   ├── App.css
+│   ├── App.jsx          # Top-level React component
+│   ├── index.css
+│   ├── main.jsx         # React entry file
 ├── .gitignore
+├── README.md
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── requirements.txt     # (May also contain dev/infra dependencies)
+├── tailwind.config.js
+├── vite.config.js
+</pre>
 
 ---
 
-## 🚦 Example
+### 🔗 Backend/API Services
 
-> *Add screenshots showing search results, mobile-friendly layout, or notable UI features here.*
+- **FastAPI structure (`routes/`)**:
+    - `main.py`: Registers and launches the API.
+    - `db_config.py`: Database connection, ORM config.
+    - `models.py`: Table/entity definitions (restaurants, users, etc.).
+    - `auth.py`: JWT login/logout, security flows.
+    - `routers/`: Modular endpoints — REST API for admin, owners, restaurants, users.
+    - `schemas.py`: Data validation with Pydantic; request and response schemas.
+    - **Endpoints:** `/restaurants`, `/users`, `/owners`, `/admin` for CRUD, login, registration, search, etc.
+
+- **Authentication:** JWT-based (login, protected routes)
+- **Database:** SQL-compatible via SQLAlchemy
+- **Requirements:** FastAPI, SQLAlchemy, Pydantic, etc.
+
+---
+
+### 💼 Frontend
+
+- Organized under `src/`:
+    - `components/`: Navbar, search bar, restaurant cards, etc.
+    - `pages/`: Home, results, login/signup, dashboards for owners/admins.
+    - API calls (fetch/Axios) point to backend endpoints for data/actions.
+
+---
+
+### 🔧 Config & Build Tools
+
+- Vite & PostCSS for speedy dev/build
+- ESLint config for code quality
+- `.gitignore` for proper workspace hygiene
+
+---
+
+## 🗣️ Frontend <-> Backend Integration
+
+- **Frontend** interactively fetches and posts data to backend REST API
+- **Backend** serves JSON, handles authentication, data, and permissions
+- **Deployment:** Vercel/Netlify (frontend), Docker/cloud/VPS (backend); update API URL in frontend config
+
+---
+
+## 🚦 Example Workflow
+
+1. User searches for a restaurant (frontend makes GET `/restaurants`).
+2. Logs in, registers, or bookmarks (frontend POST `/users`/auth endpoints).
+3. Owner/admin creates or edits restaurant data (protected backend endpoints).
+4. All business logic resides in the backend, UI logic in the frontend.
 
 ---
 
 ## 🏗️ Roadmap
 
-- Integrate real API for restaurant data
-- Add user authentication/login
-- Maps, filters, and reviews
-- Advanced search & sorting
+- Connect to restaurant datasets/APIs
+- Add location-based search and map integration
+- Implement user reviews/ratings
+- CI/CD and containerized deployment
 
 ---
 
 ## 👤 Authors
 
-Sri Ram Mannam  
-[GitHub](https://github.com/manamsriram)
+Sri Ram Mannam  - [GitHub](https://github.com/manamsriram)
+Dao Seckar  - [GitHub](https://github.com/DaoSeckar)
+Nkono Andrew Mwase  - [GitHub](https://github.com/NkonoAndrew)
+Spencer Davis  - [GitHub](https://github.com/sdavis5)
 
 ---
 
 ## 📜 License
 
 MIT License. See [`LICENSE`](LICENSE).
-
----
