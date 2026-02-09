@@ -25,13 +25,6 @@
 
 ---
 
-## 🛠️ Tech Stack
-
-| React | Vite | TailwindCSS | Python | FastAPI | SQLAlchemy | JavaScript |
-|:-----:|:----:|:-----------:|:------:|:--------:|:----------:|:----------:|
-
----
-
 ## 📦 Installation
 
 git clone https://github.com/manamsriram/Restaurant-Finder-Application.git
