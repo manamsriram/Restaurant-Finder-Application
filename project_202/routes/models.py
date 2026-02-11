@@ -1,57 +1,69 @@
+from sqlalchemy import Column, Integer, String, Float, BigInteger, TIMESTAMP, Text, CHAR, ForeignKey
+from sqlalchemy.sql import func
 from .db_config import Base
-from sqlalchemy import Column, Integer, String, Boolean, Float, Time, DECIMAL, CHAR, VARCHAR, BigInteger, DateTime
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.sql.sqltypes import TIMESTAMP
-from sqlalchemy import Column, ForeignKey
-from sqlalchemy.sql import text
 
+class User(Base):
+    __tablename__ = "user"
+
+    uid = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(15), unique=True, nullable=False)
+    email = Column(String(45), unique=True, nullable=False)
+    password = Column(String(70), nullable=False)
+    user_type = Column(CHAR(15))
+    phone = Column(BigInteger)
+    status = Column(String(20))
+    photo = Column(String(255))
+    created = Column(TIMESTAMP, server_default=func.now())
+    updated = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
 class Restaurant(Base):
-	__tablename__ = 'restaurant'
+    __tablename__ = "restaurant"
 
-	rid = Column(Integer, primary_key=True, index=True, autoincrement=True)
-	name = Column(String)
-	owner = Column(Integer)
-	address = Column(String)
-	zip = Column(Integer)
-	phone = Column(BigInteger)
-	opentime = Column(Time)
-	closetime = Column(Time)
-	description = Column(String)
-	price = Column(String)
-	rating = Column(DECIMAL(3, 2))
-	status = Column(String)
-	menu = Column(String)
-	menu_photo = Column(String)
-
+    rid = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(100), nullable=False)
+    address = Column(String(200))
+    city = Column(String(50))
+    state = Column(String(50))
+    zip_code = Column(String(10))
+    latitude = Column(Float)
+    longitude = Column(Float)
+    phone = Column(BigInteger)
+    website = Column(String(255))
+    overall_rating = Column(Float, default=0)
+    price_range = Column(String(10))
+    owner_id = Column(Integer, ForeignKey("user.uid"))
+    opentime = Column(String(10))
+    closetime = Column(String(10))
+    description = Column(Text)
+    status = Column(String(20), default='1')
+    menu = Column(Text)
+    menu_photo = Column(String(255))
+    created = Column(TIMESTAMP, server_default=func.now())
+    updated = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
 class Cuisine(Base):
-	__tablename__ = 'cuisine'
+    __tablename__ = "cuisine"
 
-	cid = Column(Integer, primary_key=True, index=True, autoincrement=True, nullable=False)
-	name = Column(String)
-	description = Column(String, nullable=False)
+    cid = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), nullable=False)
+    rid = Column(Integer, ForeignKey("restaurant.rid"))
 
 class Photo(Base):
-	__tablename__ = 'photo'
+    __tablename__ = "photo"
 
-	pid = Column(Integer, primary_key=True, index=True, autoincrement=True, nullable=False)
-	restaurant = Column(Integer)
-	user = Column(Integer)
-	image = Column(String)
-	description = Column(String)
-
+    pid = Column(Integer, primary_key=True, autoincrement=True)
+    url = Column(String(255), nullable=False)
+    rid = Column(Integer, ForeignKey("restaurant.rid"))
+    uid = Column(Integer, ForeignKey("user.uid"))
+    created = Column(TIMESTAMP, server_default=func.now())
 
 class Review(Base):
-	__tablename__ = 'review'
+    __tablename__ = "review"
 
-	rvid = Column(Integer, primary_key=True, index=True, autoincrement=True, nullable=False)
-	restaurant = Column(Integer)
-	user = Column(Integer)
-	rating = Column(Integer)
-	text = Column(String)
-	time = Column(TIMESTAMP(timezone=True))
-	replying = Column(Integer)
-	photo = Column(Integer)
-
-
+    rvid = Column(Integer, primary_key=True, autoincrement=True)
+    rating = Column(Float, nullable=False)
+    comment = Column(Text)
+    rid = Column(Integer, ForeignKey("restaurant.rid"))
+    uid = Column(Integer, ForeignKey("user.uid"))
+    created = Column(TIMESTAMP, server_default=func.now())
+    updated = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())

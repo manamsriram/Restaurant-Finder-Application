@@ -1,11 +1,86 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
-const Body = ({ searchTerm }) => {
+
+const getPriceRange = (menu) => {
+  try {
+    const menuData = JSON.parse(menu);
+    let totalPrice = 0;
+    let itemCount = 0;
+    
+    Object.values(menuData).forEach(category => {
+      category.items.forEach(item => {
+        totalPrice += item.price;
+        itemCount++;
+      });
+    });
+    
+    const avgPrice = totalPrice / itemCount;
+    if (avgPrice < 10) return "$";
+    if (avgPrice < 20) return "$$";
+    return "$$$";
+  } catch {
+    return "$$";  // Default if menu parsing fails
+  }
+};
+
+const checkIfOpen = (openTime, closeTime, status) => {
+  if (parseInt(status) === 0) {
+    return false;
+  }
+  const now = new Date();
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+  
+  // Convert restaurant times to minutes
+  const [openHour, openMinute] = openTime.split(':').map(Number);
+  const [closeHour, closeMinute] = closeTime.split(':').map(Number);
+  
+  const openTimeInMinutes = openHour * 60 + openMinute;
+  const closeTimeInMinutes = closeHour * 60 + closeMinute;
+  
+  return currentTime >= openTimeInMinutes && currentTime <= closeTimeInMinutes;
+};
+
+const RestaurantCard = ({ restaurant }) => {
+  const navigate = useNavigate();
+
+  const isCurrentlyOpen = checkIfOpen(restaurant.opentime, restaurant.closetime, restaurant.status);
+
+  const handleClick = () => {
+    navigate(`/restaurant/${restaurant.rid}`);
+  };
+
+  return (
+    <StyledCard onClick={handleClick}>
+      <CardContent>
+        <RestaurantName>{restaurant.name}</RestaurantName>
+        <Location>{restaurant.address} <br/> {restaurant.zip}</Location>
+        <Description>{restaurant.description}</Description>
+        <InfoGrid>
+          <Rating isgood={restaurant.rating >= 4}>
+            ★ {Number(restaurant.rating).toFixed(1)}
+          </Rating>
+          <PriceRange>{getPriceRange(restaurant.menu)}</PriceRange>
+          <Status isOpen={isCurrentlyOpen}>
+            {isCurrentlyOpen ? 'Open' : 'Closed'}
+          </Status>
+        </InfoGrid>
+        <Hours>
+          {`${restaurant.opentime} - ${restaurant.closetime}`}
+        </Hours>
+      </CardContent>
+    </StyledCard>
+  );
+};
+
+const Body = ({ searchTerm, setSearchTerm }) => {
   const [restaurants, setRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isZipCode, setIsZipCode] = useState(false);
+  const [apiResults, setApiResults] = useState([]);
   const [filters, setFilters] = useState({
     is_open: false,
     price_range: '',
@@ -13,12 +88,39 @@ const Body = ({ searchTerm }) => {
     sort_by: 'rating',
   });
 
+  const resetSearch = () => {
+    // Clear all applied filters
+    setFilters({
+      is_open: false,
+      price_range: '',
+      min_rating: 0,
+      sort_by: 'rating',
+    });
+  
+    // Reset the search term
+    if (setSearchTerm) {
+      setSearchTerm('');
+    }
+  
+    // Reset the filtered list
+    setFilteredRestaurants(restaurants);
+
+    setIsZipCode(false);
+    setApiResults([]);
+  };
+
+  useEffect(() => {
+    console.log('searchTerm:', searchTerm);
+    console.log('filters:', filters);
+  }, [searchTerm, filters]);
+  
+
   useEffect(() => {
     const fetchRestaurants = async () => {
       setIsLoading(true);
       try {
         console.log('Fetching restaurants...'); // Log before fetch
-        const response = await fetch('http://localhost:8000/restaurants', {
+        const response = await fetch('http://127.0.0.1:8000/restaurants', {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -50,35 +152,96 @@ const Body = ({ searchTerm }) => {
   // Handle filtering and searching
   useEffect(() => {
     let filtered = [...restaurants];
-
-    // Apply search term filter
+  
+    // Search term filter
     if (searchTerm) {
-      filtered = filtered.filter((restaurant) =>
-        restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        restaurant.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        restaurant.description.toLowerCase().includes(searchTerm.toLowerCase())
+      const isZip = /^\d{5}$/.test(searchTerm);
+      if (isZip) {
+        setIsZipCode(true);
+        filtered = filtered.filter(restaurant => 
+          restaurant.zip === parseInt(searchTerm)
+        );
+        
+        const fetchGooglePlaces = async () => {
+          try {
+            const response = await fetch(
+              `http://127.0.0.1:8000/restaurants/google-places/${searchTerm}`
+            );
+              const data = await response.json();
+              console.log('API Response:', data); // Log the entire response for debugging
+
+            if (data.results) {
+                setApiResults(data.results);
+            } else {
+                console.error('No results found in API response');
+                setApiResults([]); // Set an empty array if no results are found
+            }
+          } catch (error) {
+              console.error('Error fetching Google Places data:', error.response?.data || error.message);
+          }
+      };
+
+          fetchGooglePlaces();
+      } else {
+        setApiResults([]);
+        filtered = filtered.filter((restaurant) => {
+          const searchTermLower = searchTerm.toLowerCase();
+          const nameMatch = restaurant.name.toLowerCase().includes(searchTermLower);
+          const addressMatch = restaurant.address.toLowerCase().includes(searchTermLower);
+          const descriptionMatch = restaurant.description.toLowerCase().includes(searchTermLower);
+
+          let menuMatch = false;
+          if (restaurant.menu) {
+            try {
+              const menuItems = JSON.parse(restaurant.menu);
+              menuMatch = menuItems.some(category => 
+                category.items.some(item => 
+                  item.name.toLowerCase().includes(searchTermLower) ||
+                  item.description.toLowerCase().includes(searchTermLower)
+                )
+              );
+            } catch (error) {
+              console.error("Error parsing menu:", error);
+            }
+          }
+
+          return nameMatch || addressMatch || descriptionMatch || menuMatch;
+        });
+      }
+    }
+  
+    // Open/Closed filter
+    if (filters.is_open) {
+      filtered = filtered.filter(restaurant => {
+        const isOpen = checkIfOpen(
+          restaurant.opentime, 
+          restaurant.closetime, 
+          restaurant.status
+        );
+        return isOpen;
+      });
+    }
+  
+    // Price range filter
+    if (filters.price_range) {
+      filtered = filtered.filter(restaurant => {
+        const calculatedPrice = getPriceRange(restaurant.menu);
+        return calculatedPrice === filters.price_range;
+      });
+    }
+  
+    // Rating filter
+    if (filters.min_rating > 0) {
+      filtered = filtered.filter(restaurant => 
+        parseFloat(restaurant.rating) >= filters.min_rating
       );
     }
   
-
-    // Apply additional filters
-    if (filters.is_open) {
-      filtered = filtered.filter(restaurant => restaurant.status === 1);
-    }
-
-    if (filters.price_range) {
-      filtered = filtered.filter(restaurant => restaurant.price === filters.price_range);
-    }
-
-    if (filters.min_rating > 0) {
-      filtered = filtered.filter(restaurant => restaurant.rating >= filters.min_rating);
-    }
-
-    // Apply sorting
+    // Sorting
     if (filters.sort_by === 'rating') {
-      filtered.sort((a, b) => b.rating - a.rating);
+      filtered.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
     }
-
+  
     setFilteredRestaurants(filtered);
   }, [searchTerm, filters, restaurants]);
 
@@ -100,7 +263,7 @@ const Body = ({ searchTerm }) => {
   return (
     <MainContainer>
       <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
-        Discover Great Restaurants
+        'Discover Great Restaurants'
       </h2>
       
       {/* Filters Section */}
@@ -135,7 +298,7 @@ const Body = ({ searchTerm }) => {
             type="number"
             min="0"
             max="5"
-            step="0.5"
+            step="1"
             value={filters.min_rating}
             onChange={(e) => handleFilterChange('min_rating', parseFloat(e.target.value))}
           />
@@ -159,28 +322,43 @@ const Body = ({ searchTerm }) => {
       ) : (
         <RestaurantGrid>
           {filteredRestaurants.map((restaurant) => (
-            <RestaurantCard key={restaurant.rid}>
-              <CardContent>
-                <RestaurantName>{restaurant.name}</RestaurantName>
-                <Location>{restaurant.address}</Location>
-                <Description>{restaurant.description}</Description>
-                <InfoGrid>
-                  <Rating isGood={restaurant.rating >= 4}>
-                    ★ {Number(restaurant.rating).toFixed(1)}
-                  </Rating>
-                  <PriceRange>{restaurant.price}</PriceRange>
-                  <Status isOpen={restaurant.status === 1}>
-                    {restaurant.status === 1 ? 'Open' : 'Closed'}
-                  </Status>
-                </InfoGrid>
-                <Hours>
-                  {`${restaurant.opentime} - ${restaurant.closetime}`}
-                </Hours>
-              </CardContent>
-            </RestaurantCard>
+            <RestaurantCard 
+              key={restaurant.rid}
+              restaurant={restaurant}
+            />
           ))}
         </RestaurantGrid>
       )}
+
+      {isZipCode && apiResults.length > 0 && (
+        <div>
+          <h3>External Results from Google Places</h3>
+          <RestaurantGrid>
+              {apiResults.map((place) => (
+                  <StyledCard key={place.place_id}>
+                      <CardContent>
+                          <RestaurantName>{place.name}</RestaurantName>
+                          <Location>{place.formatted_address}</Location>
+                          <Rating isgood={place.rating >= 4}>
+                              ★ {Number(place.rating).toFixed(1)}
+                          </Rating> 
+                          <Status isOpen={place.opening_hours?.open_now}>
+                              {place.opening_hours?.open_now ? 'Open' : 'Closed'}
+                          </Status>
+                      </CardContent>
+                  </StyledCard>
+              ))}
+          </RestaurantGrid>
+      </div>
+      )}
+
+
+      {(searchTerm || filters.is_open || filters.price_range || filters.min_rating > 0) && (
+        <ResetButton onClick={resetSearch}>
+          Back to All Restaurants
+        </ResetButton>
+      )}
+
     </MainContainer>
   );
 };
@@ -196,18 +374,6 @@ const RestaurantGrid = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
   padding: 1rem;
-`;
-
-const RestaurantCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: translateY(-4px);
-  }
 `;
 
 const RestaurantImage = styled.img`
@@ -249,7 +415,7 @@ const InfoGrid = styled.div`
 `;
 
 const Rating = styled.span`
-  color: ${props => props.isGood ? '#48bb78' : '#f6ad55'};
+  color: ${props => props.isgood ? '#48bb78' : '#f6ad55'};
   font-weight: bold;
 `;
 
@@ -354,5 +520,35 @@ const FilterGroup = styled.div`
     }
   }
 `;
+
+const ResetButton = styled.button`
+  background-color: #4caf50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #45a049;
+  }
+`;
+
+const StyledCard = styled.div`
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+`;
+
 
 export default Body;

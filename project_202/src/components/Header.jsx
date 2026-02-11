@@ -7,6 +7,10 @@ import Login from './Login';
 const Header = ({ setSearchTerm }) => {
   const [showSignup, setShowSignup] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user');
+    return saved ? JSON.parse(saved) : null;
+  });
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -29,6 +33,13 @@ const Header = ({ setSearchTerm }) => {
     setShowLogin(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
+    setUser(null);
+    window.location.href = '/';
+  };
+
   return (
     <header className="bg-gray-600 text-white p-4">
       <NavContainer>
@@ -45,44 +56,67 @@ const Header = ({ setSearchTerm }) => {
           </SearchButton>
         </SearchForm>
         <NavList>
-          <NavItem>
-            <StyledNavLink to="/business">Business Owner?</StyledNavLink>
-          </NavItem>
-          <NavItem>
-            <StyledButton onClick={handleLoginClick}>Login</StyledButton>
-          </NavItem>
-          <NavItem>
-            <StyledButton onClick={handleSignupClick}>Signup</StyledButton>
-          </NavItem>
+          {user ? (
+            <>
+              <NavItem>
+                <span className="font-bold">👤 {user.username}</span>
+              </NavItem>
+              {user.user_type === 'owner' && (
+                <NavItem>
+                  <StyledNavLink to="/business">My Listings</StyledNavLink>
+                </NavItem>
+              )}
+              {user.user_type === 'admin' && (
+                <NavItem>
+                  <StyledNavLink to="/admin">Admin</StyledNavLink>
+                </NavItem>
+              )}
+              <NavItem>
+                <StyledButton onClick={handleLogout}>Logout</StyledButton>
+              </NavItem>
+            </>
+          ) : (
+            <>
+              <NavItem>
+                <StyledNavLink to="/business">Business Owner?</StyledNavLink>
+              </NavItem>
+              <NavItem>
+                <StyledButton onClick={handleLoginClick}>Login</StyledButton>
+              </NavItem>
+              <NavItem>
+                <StyledButton onClick={handleSignupClick}>Signup</StyledButton>
+              </NavItem>
+            </>
+          )}
         </NavList>
       </NavContainer>
 
       {/* Signup Modal */}
       {showSignup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-auto relative">
             <button
               onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl"
             >
               &times;
             </button>
-            <Signup />
+            <Signup setShowLogin={setShowLogin} setShowSignup={setShowSignup} />
           </div>
         </div>
       )}
 
       {/* Login Modal */}
       {showLogin && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-auto relative">
             <button
               onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl"
             >
               &times;
             </button>
-            <Login />
+            <Login setShowLogin={setShowLogin} setUser={setUser} />
           </div>
         </div>
       )}
