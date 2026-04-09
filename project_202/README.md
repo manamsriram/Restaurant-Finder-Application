@@ -57,8 +57,24 @@ uvicorn main:app --reload
 
 text
 
+**Backend tests (unit + integration):**
+pip install -r routes/requirements.txt
+pytest tests
+
+text
+
 API by default on `localhost:8000`.  
 Point frontend API calls to backend server URL.
+
+---
+
+## ✅ Automated CI Testing
+
+- GitHub Actions workflow file: `.github/workflows/ci-tests.yml`
+- Triggers on every push and pull request
+- Installs backend dependencies from `project_202/routes/requirements.txt`
+- Runs all unit and integration tests under `project_202/tests`
+- Uses a temporary SQLite database in CI (`DATABASE_URL=sqlite:///./ci.db`) so tests do not depend on production MySQL credentials
 
 ---
 

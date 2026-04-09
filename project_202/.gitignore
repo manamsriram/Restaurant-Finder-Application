@@ -25,3 +25,13 @@ dist-ssr
 
 # Environment variables
 .env
+
+# Python test/build artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+.ci-venv/
+test_ci.db
+ci.db

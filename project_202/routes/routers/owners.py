@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 import pymysql
 from sqlalchemy.orm import Session
 from .. import models, schemas, oauth2
-from .. db_config import get_db
+from ..db_config import get_db
 from datetime import datetime
 from typing import List
 

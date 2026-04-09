@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import HTTPException, Response, status, Depends, APIRouter
 from sqlalchemy.orm import Session
 from .. import models, schemas
-from .. db_config import get_db
+from ..db_config import get_db
 from .. import utils
 
 # Create a router object
