@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../lib/api';
 
 
 const getPriceRange = (menu) => {
@@ -45,6 +46,8 @@ const checkIfOpen = (openTime, closeTime, status) => {
 const RestaurantCard = ({ restaurant }) => {
   const navigate = useNavigate();
 
+  const ratingValue = Number(restaurant.rating ?? restaurant.overall_rating ?? 0);
+  const zipValue = restaurant.zip ?? restaurant.zip_code ?? '';
   const isCurrentlyOpen = checkIfOpen(restaurant.opentime, restaurant.closetime, restaurant.status);
 
   const handleClick = () => {
@@ -55,11 +58,11 @@ const RestaurantCard = ({ restaurant }) => {
     <StyledCard onClick={handleClick}>
       <CardContent>
         <RestaurantName>{restaurant.name}</RestaurantName>
-        <Location>{restaurant.address} <br/> {restaurant.zip}</Location>
+        <Location>{restaurant.address} <br/> {zipValue}</Location>
         <Description>{restaurant.description}</Description>
         <InfoGrid>
-          <Rating isgood={restaurant.rating >= 4}>
-            ★ {Number(restaurant.rating).toFixed(1)}
+          <Rating isgood={ratingValue >= 4}>
+            ★ {ratingValue.toFixed(1)}
           </Rating>
           <PriceRange>{getPriceRange(restaurant.menu)}</PriceRange>
           <Status isOpen={isCurrentlyOpen}>
@@ -120,7 +123,7 @@ const Body = ({ searchTerm, setSearchTerm }) => {
       setIsLoading(true);
       try {
         console.log('Fetching restaurants...'); // Log before fetch
-        const response = await fetch('http://127.0.0.1:8000/restaurants', {
+        const response = await fetch(apiUrl('/restaurants'), {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -165,7 +168,7 @@ const Body = ({ searchTerm, setSearchTerm }) => {
         const fetchGooglePlaces = async () => {
           try {
             const response = await fetch(
-              `http://127.0.0.1:8000/restaurants/google-places/${searchTerm}`
+              apiUrl(`/restaurants/google-places/${searchTerm}`)
             );
               const data = await response.json();
               console.log('API Response:', data); // Log the entire response for debugging
@@ -262,9 +265,10 @@ const Body = ({ searchTerm, setSearchTerm }) => {
 
   return (
     <MainContainer>
-      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
-        'Discover Great Restaurants'
-      </h2>
+      <HeroBanner className="rf-fade-up">
+        <h2>Discover Your Next Great Meal</h2>
+        <p>Search by neighborhood, dish, or ZIP and instantly compare ratings, price, and live opening status.</p>
+      </HeroBanner>
       
       {/* Filters Section */}
       <FiltersSection>
@@ -365,15 +369,39 @@ const Body = ({ searchTerm, setSearchTerm }) => {
 
 const MainContainer = styled.main`
   flex-grow: 1;
-  padding: 2rem;
-  background-color: #f8f9fa;
+  width: min(1200px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.5rem 0 2.2rem;
+`;
+
+const HeroBanner = styled.section`
+  border-radius: 24px;
+  padding: 1.6rem;
+  margin-bottom: 1.2rem;
+  color: #fff;
+  background:
+    radial-gradient(circle at 8% 18%, rgba(244, 163, 0, 0.4), transparent 40%),
+    linear-gradient(130deg, #1f2421, #167a72);
+  box-shadow: 0 14px 36px rgba(31, 36, 33, 0.25);
+
+  h2 {
+    font-size: clamp(1.65rem, 2.8vw, 2.35rem);
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  p {
+    margin: 0.75rem 0 0;
+    color: rgba(255, 255, 255, 0.86);
+    max-width: 780px;
+  }
 `;
 
 const RestaurantGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+  gap: 1.1rem;
+  padding: 0.4rem 0;
 `;
 
 const RestaurantImage = styled.img`
@@ -383,23 +411,24 @@ const RestaurantImage = styled.img`
 `;
 
 const CardContent = styled.div`
-  padding: 1.5rem;
+  padding: 1.1rem;
 `;
 
 const RestaurantName = styled.h3`
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.3rem;
+  font-family: 'Fraunces', serif;
+  line-height: 1.2;
   margin-bottom: 0.5rem;
-  color: #2d3748;
+  color: #1f2421;
 `;
 
 const Location = styled.p`
-  color: #4a5568;
+  color: #59655f;
   margin-bottom: 0.5rem;
 `;
 
 const Description = styled.p`
-  color: #718096;
+  color: #6d7973;
   margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -415,23 +444,23 @@ const InfoGrid = styled.div`
 `;
 
 const Rating = styled.span`
-  color: ${props => props.isgood ? '#48bb78' : '#f6ad55'};
+  color: ${props => props.isgood ? '#0d8665' : '#c7522a'};
   font-weight: bold;
 `;
 
 const PriceRange = styled.span`
-  color: #4a5568;
+  color: #48534e;
   text-align: center;
 `;
 
 const Status = styled.span`
-  color: ${props => props.isOpen ? '#48bb78' : '#f56565'};
+  color: ${props => props.isOpen ? '#0d8665' : '#c8384a'};
   text-align: right;
   font-weight: bold;
 `;
 
 const Hours = styled.p`
-  color: #718096;
+  color: #6d7973;
   font-size: 0.875rem;
   margin-top: 0.5rem;
 `;
@@ -456,20 +485,21 @@ const ErrorContainer = styled.div`
 
 const NoResults = styled.p`
   text-align: center;
-  color: #718096;
+  color: #55615b;
   font-size: 1.2rem;
   margin-top: 2rem;
 `;
 
 const FiltersSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(6px);
+  padding: 1rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(31, 36, 33, 0.1);
+  margin-bottom: 1.2rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 1rem;
   align-items: center;
 `;
 
@@ -479,7 +509,7 @@ const FilterGroup = styled.div`
   gap: 0.5rem;
 
   label {
-    color: #4a5568;
+    color: #3f4a45;
     font-weight: 500;
   }
 
@@ -492,27 +522,27 @@ const FilterGroup = styled.div`
   input[type="number"] {
     width: 4rem;
     padding: 0.25rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
+    border: 1px solid #d8d0c5;
+    border-radius: 8px;
     outline: none;
     
     &:focus {
-      border-color: #4caf50;
-      box-shadow: 0 0 0 1px #4caf50;
+      border-color: #167a72;
+      box-shadow: 0 0 0 1px #167a72;
     }
   }
 
   select {
     padding: 0.25rem 0.5rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
+    border: 1px solid #d8d0c5;
+    border-radius: 8px;
     outline: none;
-    background-color: white;
+    background-color: #fff;
     cursor: pointer;
     
     &:focus {
-      border-color: #4caf50;
-      box-shadow: 0 0 0 1px #4caf50;
+      border-color: #167a72;
+      box-shadow: 0 0 0 1px #167a72;
     }
 
     option {
@@ -522,31 +552,33 @@ const FilterGroup = styled.div`
 `;
 
 const ResetButton = styled.button`
-  background-color: #4caf50;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border: none;
+  background-color: #fff;
+  color: #1f2421;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #d6cec3;
   cursor: pointer;
-  margin-bottom: 1rem;
+  margin: 0.4rem 0 1rem;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: transform 0.2s;
 
   &:hover {
-    background-color: #45a049;
+    transform: translateY(-2px);
   }
 `;
 
 const StyledCard = styled.div`
-  background: white;
-  border-radius: 12px;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #efe6d9;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  box-shadow: 0 12px 24px rgba(31, 36, 33, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 
   &:hover {
     transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(31, 36, 33, 0.14);
   }
 `;
 

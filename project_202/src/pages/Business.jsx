@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { Link, useNavigate } from 'react-router-dom';
+import { apiUrl } from '../lib/api';
 
 export default function Business() {
     const [resturants, setResturants] = useState([]);
@@ -23,7 +24,7 @@ export default function Business() {
             }
             
             try {
-                const response = await fetch(`http://127.0.0.1:8000/owner/view-listings`, {
+                const response = await fetch(apiUrl('/owner/view-listings'), {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -115,7 +116,7 @@ export default function Business() {
         const token = localStorage.getItem('access_token');
         
         try {
-            const response = await fetch(`http://127.0.0.1:8000/owner/delete-listing/${selectedRestaurant}`, {
+            const response = await fetch(apiUrl(`/owner/delete-listing/${selectedRestaurant}`), {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -146,13 +147,17 @@ export default function Business() {
     };
 
     if (isLoading) {
-        return <h1 className='w-full m-auto text-4xl font-bold text-center'>Loading...</h1>
+        return <h1 className='rf-page w-full m-auto text-4xl text-center pt-10'>Loading...</h1>
     }
 
     return (
-        <div className='relative'>
-            <h1 className='text-center px-5 py-5 justify-center text-4xl font-bold'>My Resturants</h1>
-            <p className='absolute right-5 cursor-pointer px-3 py-3 top-5 bg-green-500 rounded-lg'><Link to={"/business/addNew"}>Add New Resturant</Link></p>
+        <div className='rf-page relative pt-4'>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+                <h1 className='text-4xl'>Owner Dashboard</h1>
+                <p className='cursor-pointer px-4 py-2 rounded-full text-white bg-[#c7522a]'>
+                    <Link to={"/business/addNew"}>Add New Restaurant</Link>
+                </p>
+            </div>
             <ul>
                 <RestaurantGrid>
                     {resturants.length > 0 ? (resturants.map((restaurant) => (
@@ -190,23 +195,23 @@ export default function Business() {
                             </CardContent>
                         </RestaurantCard>
                     ))) : (
-                        <h1 className='w-full mx-auto text-xl text-center'>No Resturants Found for this owner</h1>
+                        <h1 className='w-full mx-auto text-xl text-center'>No restaurants found for this owner.</h1>
                     )}
                 </RestaurantGrid>
             </ul>
             {confirmDelete && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-                    <div className="bg-red-500 rounded-lg p-6 w-full max-w-md mx-auto relative">
+                    <div className="bg-white rounded-xl p-6 w-full max-w-md mx-auto relative border border-[#ecdccf]">
                         <button
                             onClick={handleCloseModal}
-                            className="absolute top-2 right-2 text-white hover:text-gray-700 focus:outline-none"
+                            className="absolute top-2 right-3 text-[#66736d] hover:text-black focus:outline-none"
                         >
                             &times;
                         </button>
-                        <p className="text-white w-full text-center">Are you sure you want to delete it?</p>
+                        <p className="text-[#1f2421] w-full text-center">Are you sure you want to delete this listing?</p>
                         <div className="flex justify-center gap-5 pt-5">
-                            <button onClick={handleConfirmDelete} className='shadow bg-green-500  focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded'>Yes</button>
-                            <button onClick={handleCloseModal} className='shadow bg-blue-500  focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded'>No</button>
+                            <button onClick={handleConfirmDelete} className='rf-btn rf-btn-primary'>Delete</button>
+                            <button onClick={handleCloseModal} className='rf-btn rf-btn-muted'>Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -220,16 +225,17 @@ export default function Business() {
 
 const RestaurantGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+    gap: 1rem;
+    padding: 0.5rem 0;
 `;
 
 const RestaurantCard = styled.div`
-  background: white;
-  border-radius: 12px;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #efe6d9;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 24px rgba(31, 36, 33, 0.08);
   transition: transform 0.2s;
 
   &:hover {
@@ -244,23 +250,23 @@ const RestaurantImage = styled.img`
 `;
 
 const CardContent = styled.div`
-  padding: 1.5rem;
+    padding: 1.1rem;
 `;
 
 const RestaurantName = styled.h3`
-  font-size: 1.5rem;
-  font-weight: bold;
+    font-size: 1.3rem;
+    font-family: 'Fraunces', serif;
   margin-bottom: 0.5rem;
-  color: #2d3748;
+    color: #1f2421;
 `;
 
 const Location = styled.p`
-  color: #4a5568;
+    color: #5e6a64;
   margin-bottom: 0.5rem;
 `;
 
 const Description = styled.p`
-  color: #718096;
+    color: #6e7a74;
   margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -276,7 +282,7 @@ const InfoGrid = styled.div`
 `;
 
 const Rating = styled.span`
-  color: ${props => props.isGood ? '#48bb78' : '#f6ad55'};
+    color: ${props => props.isGood ? '#0d8665' : '#c7522a'};
   font-weight: bold;
 `;
 
@@ -286,7 +292,7 @@ const PriceRange = styled.span`
 `;
 
 const Status = styled.span`
-  color: ${props => props.isOpen ? '#48bb78' : '#f56565'};
+    color: ${props => props.isOpen ? '#0d8665' : '#c8384a'};
   text-align: right;
   font-weight: bold;
 `;

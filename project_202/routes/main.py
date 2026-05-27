@@ -14,6 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from fastapi import Request
 import json
 from .routers import restaurants, users, auth, owners
+from .config import settings
 
 # Get the absolute path of the directory containing your script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -23,12 +24,16 @@ load_dotenv(dotenv_path=env_path)
 
 app = FastAPI()
 
+cors_origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(',') if origin.strip()]
+allow_all_origins = '*' in cors_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[] if allow_all_origins else cors_origins,
+    allow_origin_regex='.*' if allow_all_origins else None,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 models.Base.metadata.create_all(bind=engine)

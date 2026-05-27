@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { apiUrl } from '../lib/api';
 
 const RestaurantDetails = () => {
   const { rid } = useParams();
@@ -41,19 +42,19 @@ const RestaurantDetails = () => {
     const fetchRestaurantData = async () => {
       try {
         // Fetch basic restaurant details
-        const restaurantResponse = await fetch(`http://127.0.0.1:8000/restaurants/${rid}`);
+        const restaurantResponse = await fetch(apiUrl(`/restaurants/${rid}`));
         const restaurantData = await restaurantResponse.json();
         setRating(restaurantData.overall_rating || 0);
         setRestaurant(restaurantData);
 
         // Fetch menu
-        const menuResponse = await fetch(`http://127.0.0.1:8000/restaurants/${rid}/menu`);
+        const menuResponse = await fetch(apiUrl(`/restaurants/${rid}/menu`));
         const menuData = await menuResponse.json();
         console.log('Menu data:', menuData);
         setMenu(menuData);
 
         // Fetch reviews
-        const reviewsResponse = await fetch(`http://127.0.0.1:8000/restaurants/${rid}/reviews`);
+        const reviewsResponse = await fetch(apiUrl(`/restaurants/${rid}/reviews`));
         const reviewsData = await reviewsResponse.json();
         setReviews(reviewsData);
 
@@ -67,8 +68,8 @@ const RestaurantDetails = () => {
     fetchRestaurantData();
   }, [rid]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!restaurant) return <div>Restaurant not found</div>;
+  if (isLoading) return <div className="rf-page pt-8">Loading...</div>;
+  if (!restaurant) return <div className="rf-page pt-8">Restaurant not found</div>;
 
   return (
     <DetailContainer>
@@ -184,7 +185,7 @@ const ReviewForm = ({ rid }) => {
       }
   
       try {
-        const response = await fetch(`http://127.0.0.1:8000/restaurants/${rid}/create_review`, {
+        const response = await fetch(apiUrl(`/restaurants/${rid}/create_review`), {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -229,16 +230,17 @@ const ReviewForm = ({ rid }) => {
   };
   
 const ReviewFormContainer = styled.div`
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 2rem;
+  background: white;
+  padding: 1.2rem;
+  border-radius: 16px;
+  border: 1px solid #efe6d9;
+  box-shadow: 0 10px 28px rgba(31, 36, 33, 0.08);
+  margin-bottom: 1.2rem;
   
     h3 {
       font-size: 1.2rem;
       margin-bottom: 1rem;
-      color: #2d3748;
+      color: #1f2421;
     }
   `;
   
@@ -263,10 +265,10 @@ const StarContainer = styled.div`
 const Star = styled.span`
   cursor: pointer;
   font-size: 1.5rem;
-  color: ${props => props.filled ? '#48bb78' : '#cbd5e0'};
+  color: ${props => props.filled ? '#0d8665' : '#cbd5e0'};
   
   &:hover {
-    color: #48bb78;
+    color: #0d8665;
   }
 `;
 
@@ -274,29 +276,29 @@ const TextArea = styled.textarea`
     width: 100%;
     min-height: 100px;
     padding: 0.75rem;
-    border-radius: 4px;
-    border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  border: 1px solid #ddd3c6;
     margin-bottom: 1rem;
     resize: vertical;
   `;
   
 const SubmitButton = styled.button`
-    background: #48bb78;
+    background: linear-gradient(120deg, #c7522a, #de6f32);
     color: white;
     padding: 0.75rem 1.5rem;
-    border-radius: 4px;
+    border-radius: 999px;
     border: none;
     cursor: pointer;
     font-weight: 500;
   
     &:hover {
-      background: #38a169;
+      opacity: 0.92;
     }
   `;
  
 const DetailContainer = styled.div`
-  max-width: 1200px;
-  margin: 2rem auto;
+  max-width: 1100px;
+  margin: 1.2rem auto 2rem;
   padding: 0 1rem;
 `;
 
@@ -304,39 +306,57 @@ const RestaurantHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
+  padding: 1.2rem;
+  border-radius: 20px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 8% 18%, rgba(244, 163, 0, 0.4), transparent 40%),
+    linear-gradient(130deg, #1f2421, #167a72);
+  box-shadow: 0 14px 36px rgba(31, 36, 33, 0.23);
   
   h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #2d3748;
+    font-size: 2.2rem;
+    line-height: 1.1;
+    margin: 0;
   }
 `;
 
 const InfoSection = styled.section`
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
   line-height: 1.6;
+  background: #fff;
+  border: 1px solid #efe6d9;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 10px 28px rgba(31, 36, 33, 0.08);
   
   p {
     margin-bottom: 0.5rem;
-    color: #4a5568;
+    color: #55615b;
   }
 `;
 
 const ReviewsSection = styled.section`
+  background: #fff;
+  border: 1px solid #efe6d9;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 10px 28px rgba(31, 36, 33, 0.08);
+
   h2 {
     font-size: 1.8rem;
     margin-bottom: 1rem;
-    color: #2d3748;
+    color: #1f2421;
   }
 `;
 
 const ReviewCard = styled.div`
-  background: white;
+  background: #fef9f1;
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid #efe6d9;
 `;
 
 const ReviewHeader = styled.div`
@@ -348,12 +368,12 @@ const ReviewHeader = styled.div`
 
 const ReviewerName = styled.span`
   font-weight: bold;
-  color: #2d3748;
+  color: #1f2421;
   margin-right: 1rem;  // Add space between name and rating
 `;
 
 const Rating = styled.span`
-  color: ${props => props.isGood ? '#48bb78' : '#f6ad55'};
+  color: ${props => props.isGood ? '#0d8665' : '#c7522a'};
   font-weight: bold;
   margin-left: 0.5rem;  // Add space to the left of rating
 `;

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { apiUrl } from '../lib/api';
 
 const Signup = ({ setShowLogin, setShowSignup }) => {
   const [userData, setUserData] = useState({
@@ -65,9 +66,9 @@ const Signup = ({ setShowLogin, setShowSignup }) => {
     
     try {
       // Choose endpoint based on user type
-      const endpoint = userData.user_type === 'owner' 
-        ? "http://127.0.0.1:8000/users/create_owner"
-        : "http://127.0.0.1:8000/users/create_users";
+      const endpoint = userData.user_type === 'owner'
+        ? apiUrl('/users/create_owner')
+        : apiUrl('/users/create_users');
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -101,21 +102,23 @@ const Signup = ({ setShowLogin, setShowSignup }) => {
 
   return (
     <div className="w-full max-w-md">
-      <form className='border border-black text-black p-4 rounded-md flex flex-col items-center gap-5' 
+      <form className='rf-card text-[#1f2421] p-6 rounded-2xl flex flex-col items-stretch gap-5 border border-black/5' 
         onSubmit={handleSubmit}>
-        <h1 className='text-xl font-bold'>Create Account</h1>
+        <h1 className='text-3xl'>Create Your Account</h1>
+        <p className="text-sm text-[#5b6761] -mt-2">Join to track favorites or publish your own listings.</p>
         
         {errors.submit && (
-          <div className="w-full p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className="w-full p-2 bg-[#ffe9ed] border border-[#f3b2be] text-[#9c2339] rounded-lg">
             {errors.submit}
           </div>
         )}
 
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-2">
+          <label className="text-sm font-semibold text-[#3f4a45]">Username</label>
           <input 
-            className={`bg-gray-200 appearance-none border-2 ${
-              errors.username ? 'border-red-500' : 'border-gray-200'
-            } rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500`}
+            className={`bg-[#f8f4ec] appearance-none border ${
+              errors.username ? 'border-red-500' : 'border-[#e1d8ca]'
+            } rounded-xl w-full py-2 px-4 text-[#1f2421] leading-tight focus:outline-none focus:border-[#167a72]`}
             placeholder='Username'
             type="text"
             name="username"
@@ -128,11 +131,12 @@ const Signup = ({ setShowLogin, setShowSignup }) => {
           )}
         </div>
 
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-2">
+          <label className="text-sm font-semibold text-[#3f4a45]">Email</label>
           <input 
-            className={`bg-gray-200 appearance-none border-2 ${
-              errors.email ? 'border-red-500' : 'border-gray-200'
-            } rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500`}
+            className={`bg-[#f8f4ec] appearance-none border ${
+              errors.email ? 'border-red-500' : 'border-[#e1d8ca]'
+            } rounded-xl w-full py-2 px-4 text-[#1f2421] leading-tight focus:outline-none focus:border-[#167a72]`}
             placeholder='Email'
             type="email"
             name="email"
@@ -145,11 +149,12 @@ const Signup = ({ setShowLogin, setShowSignup }) => {
           )}
         </div>
 
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-2">
+          <label className="text-sm font-semibold text-[#3f4a45]">Password</label>
           <input 
-            className={`bg-gray-200 appearance-none border-2 ${
-              errors.password ? 'border-red-500' : 'border-gray-200'
-            } rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500`}
+            className={`bg-[#f8f4ec] appearance-none border ${
+              errors.password ? 'border-red-500' : 'border-[#e1d8ca]'
+            } rounded-xl w-full py-2 px-4 text-[#1f2421] leading-tight focus:outline-none focus:border-[#167a72]`}
             placeholder='Password'
             type={showPassword ? 'text' : 'password'}
             name="password"
@@ -162,11 +167,12 @@ const Signup = ({ setShowLogin, setShowSignup }) => {
           )}
         </div>
 
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-2">
+          <label className="text-sm font-semibold text-[#3f4a45]">Confirm Password</label>
           <input 
-            className={`bg-gray-200 appearance-none border-2 ${
-              errors.confirmPassword ? 'border-red-500' : 'border-gray-200'
-            } rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500`}
+            className={`bg-[#f8f4ec] appearance-none border ${
+              errors.confirmPassword ? 'border-red-500' : 'border-[#e1d8ca]'
+            } rounded-xl w-full py-2 px-4 text-[#1f2421] leading-tight focus:outline-none focus:border-[#167a72]`}
             placeholder='Confirm Password'
             type={showPassword ? 'text' : 'password'}
             value={confirmPassword}
@@ -178,18 +184,18 @@ const Signup = ({ setShowLogin, setShowSignup }) => {
           )}
         </div>
 
-        <label className="w-full flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+        <label className="w-full flex items-center gap-2 text-sm text-[#5b6761] cursor-pointer">
           <input
             type="checkbox"
             checked={showPassword}
             onChange={(e) => setShowPassword(e.target.checked)}
-            className="accent-green-500"
+            className="accent-[#167a72]"
           />
           Show Password
         </label>
 
         <select 
-          className='bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500'
+          className='bg-[#f8f4ec] appearance-none border border-[#e1d8ca] rounded-xl w-full py-2 px-4 text-[#1f2421] leading-tight focus:outline-none focus:border-[#167a72]'
           name="user_type"
           value={userData.user_type}
           onChange={handleChange}
@@ -200,7 +206,7 @@ const Signup = ({ setShowLogin, setShowSignup }) => {
 
         <button 
           type="submit"
-          className='shadow bg-green-500 hover:bg-green-600 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded w-full'
+          className='rf-btn rf-btn-primary w-full'
         >
           Sign Up
         </button>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import Signup from './Signup';
@@ -15,22 +16,20 @@ const Header = ({ setSearchTerm }) => {
   const handleSearch = (e) => {
     e.preventDefault();
     const searchValue = e.target.elements.search.value;
-    if (searchValue.trim()) {
-      setSearchTerm(searchValue);
-    }
-  };
-
-  const handleSignupClick = () => {
-    setShowSignup(true);
-  };
-
-  const handleLoginClick = () => {
-    setShowLogin(true);
+    setSearchTerm(searchValue.trim());
   };
 
   const handleCloseModal = () => {
     setShowSignup(false);
     setShowLogin(false);
+  };
+
+  const renderModal = (content) => {
+    if (typeof document === 'undefined') {
+      return null;
+    }
+
+    return createPortal(content, document.body);
   };
 
   const handleLogout = () => {
@@ -41,174 +40,230 @@ const Header = ({ setSearchTerm }) => {
   };
 
   return (
-    <header className="bg-gray-600 text-white p-4">
-      <NavContainer>
-        <NavLink to="/" className="font-bold mb-1">Restaurant Finder</NavLink>
+    <HeaderShell className="rf-fade-up">
+      <HeaderGlow />
+      <TopBar className="rf-page">
+        <BrandBlock to="/">
+          <BrandEyebrow>RESTAURANT FINDER</BrandEyebrow>
+          <BrandTitle>Taste The City</BrandTitle>
+        </BrandBlock>
+
         <SearchForm onSubmit={handleSearch}>
           <SearchInput
             type="text"
             name="search"
-            placeholder="Search restaurants..."
+            placeholder="Name, dish, or ZIP code"
             autoComplete="off"
           />
-          <SearchButton type="submit">
-            Search
-          </SearchButton>
+          <SearchButton type="submit">Find</SearchButton>
         </SearchForm>
+
         <NavList>
           {user ? (
             <>
-              <NavItem>
-                <span className="font-bold">👤 {user.username}</span>
-              </NavItem>
-              {user.user_type === 'owner' && (
-                <NavItem>
-                  <StyledNavLink to="/business">My Listings</StyledNavLink>
-                </NavItem>
-              )}
-              {user.user_type === 'admin' && (
-                <NavItem>
-                  <StyledNavLink to="/admin">Admin</StyledNavLink>
-                </NavItem>
-              )}
-              <NavItem>
-                <StyledButton onClick={handleLogout}>Logout</StyledButton>
-              </NavItem>
+              <UserTag>Hi, {user.username}</UserTag>
+              {user.user_type === 'owner' && <StyledNavLink to="/business">Dashboard</StyledNavLink>}
+              {user.user_type === 'admin' && <StyledNavLink to="/admin">Admin</StyledNavLink>}
+              <PlainButton type="button" onClick={handleLogout}>Log out</PlainButton>
             </>
           ) : (
             <>
-              <NavItem>
-                <StyledNavLink to="/business">Business Owner?</StyledNavLink>
-              </NavItem>
-              <NavItem>
-                <StyledButton onClick={handleLoginClick}>Login</StyledButton>
-              </NavItem>
-              <NavItem>
-                <StyledButton onClick={handleSignupClick}>Signup</StyledButton>
-              </NavItem>
+              <StyledNavLink to="/business">Owner Portal</StyledNavLink>
+              <PlainButton type="button" onClick={() => setShowLogin(true)}>Log in</PlainButton>
+              <PrimaryButton type="button" onClick={() => setShowSignup(true)}>Create Account</PrimaryButton>
             </>
           )}
         </NavList>
-      </NavContainer>
+      </TopBar>
 
-      {/* Signup Modal */}
-      {showSignup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-auto relative">
-            <button
-              onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl"
-            >
-              &times;
-            </button>
+      {showSignup && renderModal(
+        <ModalBackdrop>
+          <ModalCard>
+            <CloseBtn onClick={handleCloseModal} aria-label="Close signup">&times;</CloseBtn>
             <Signup setShowLogin={setShowLogin} setShowSignup={setShowSignup} />
-          </div>
-        </div>
+          </ModalCard>
+        </ModalBackdrop>
       )}
 
-      {/* Login Modal */}
-      {showLogin && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-auto relative">
-            <button
-              onClick={handleCloseModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl"
-            >
-              &times;
-            </button>
+      {showLogin && renderModal(
+        <ModalBackdrop>
+          <ModalCard>
+            <CloseBtn onClick={handleCloseModal} aria-label="Close login">&times;</CloseBtn>
             <Login setShowLogin={setShowLogin} setUser={setUser} />
-          </div>
-        </div>
+          </ModalCard>
+        </ModalBackdrop>
       )}
-    </header>
+    </HeaderShell>
   );
 };
 
-// Styled Components
-const NavContainer = styled.nav`
-  display: flex;
-  justify-content: space-between;
+const HeaderShell = styled.header`
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: linear-gradient(110deg, rgba(31, 36, 33, 0.95), rgba(22, 122, 114, 0.86));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+`;
+
+const HeaderGlow = styled.div`
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 6% 30%, rgba(244, 163, 0, 0.24), transparent 35%),
+    radial-gradient(circle at 90% 50%, rgba(255, 255, 255, 0.14), transparent 40%);
+  pointer-events: none;
+`;
+
+const TopBar = styled.nav`
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  padding: 0 2rem;
-`;
+  gap: 1rem;
+  min-height: 88px;
+  padding: 1rem 0;
 
-const NavList = styled.ul`
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`;
-
-const NavItem = styled.li`
-  margin-left: 1rem;
-  padding: 0.3rem 0.5rem;
-`;
-
-const StyledNavLink = styled(NavLink)`
-  color: inherit;
-  text-decoration: none;
-  font-weight: bold;
-
-  &:hover {
-    text-decoration: underline;
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
   }
+`;
+
+const BrandBlock = styled(NavLink)`
+  display: inline-flex;
+  flex-direction: column;
+  color: #fff;
+`;
+
+const BrandEyebrow = styled.span`
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  opacity: 0.75;
+`;
+
+const BrandTitle = styled.span`
+  font-size: 1.5rem;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  line-height: 1.1;
 `;
 
 const SearchForm = styled.form`
   display: flex;
   align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  padding: 0.3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 `;
 
 const SearchInput = styled.input`
-  margin-right: 0.5rem;
-  padding: 0.5rem 1rem;
-  width: 300px;
-  border-radius: 20px;
-  border: 1px solid #ddd;
-  background-color: white;
-  color: #333;
-  font-size: 16px;
+  width: 100%;
+  border: none;
   outline: none;
+  background: transparent;
+  padding: 0.68rem 1rem;
+  color: #1f2421;
+  font-size: 0.95rem;
 
   &::placeholder {
-    color: #888;
-    opacity: 1;
-  }
-
-  &:focus {
-    border-color: #4caf50;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    color: #69746f;
   }
 `;
 
 const SearchButton = styled.button`
-  padding: 0.5rem 1rem;
-  background-color: #4caf50;
-  color: white;
   border: none;
-  border-radius: 20px;
+  border-radius: 999px;
+  padding: 0.62rem 1rem;
+  color: #fff;
+  background: linear-gradient(125deg, #c7522a, #de6f32);
+  font-weight: 700;
   cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.2s ease;
+`;
+
+const NavList = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+`;
+
+const StyledNavLink = styled(NavLink)`
+  color: #ecf7f3;
+  font-weight: 600;
+  padding: 0.48rem 0.75rem;
+  border-radius: 999px;
+  transition: background 180ms ease;
 
   &:hover {
-    background-color: #45a049;
+    background: rgba(255, 255, 255, 0.15);
   }
 `;
 
-const StyledButton = styled.button`
-  background-color: red;
-  color: white;
-  font-size: 15px;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+const UserTag = styled.span`
+  color: #ecf7f3;
+  font-weight: 600;
+  padding: 0.48rem 0.75rem;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+`;
 
-  &:hover {
-    background-color: #045a3d;
-  }
+const PlainButton = styled.button`
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.48rem 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+`;
+
+const PrimaryButton = styled.button`
+  border: none;
+  background: linear-gradient(125deg, #f4a300, #efbb53);
+  color: #1f2421;
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+`;
+
+const ModalBackdrop = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 24, 22, 0.52);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5rem 1rem 1.5rem;
+  overflow-y: auto;
+  z-index: 9999;
+`;
+
+const ModalCard = styled.div`
+  width: min(480px, 100%);
+  position: relative;
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+  padding: 1.25rem;
+  margin-top: 2rem;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  width: min(480px, 100%);
+`;
+
+const CloseBtn = styled.button`
+  position: absolute;
+  top: 0.5rem;
+  right: 0.8rem;
+  font-size: 1.8rem;
+  border: none;
+  background: transparent;
+  color: #5c6b64;
+  cursor: pointer;
 `;
 
 export default Header;

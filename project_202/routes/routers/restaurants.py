@@ -9,7 +9,6 @@ import pymysql.cursors
 import pymysql
 from sqlalchemy.orm import Session
 import googlemaps
-import os
 from .. import models, schemas, oauth2
 from ..db_config import get_db
 from ..config import settings
@@ -100,7 +99,7 @@ def create_review(restaurant_id: int, review: schemas.ReviewCreate, db: Session 
 
 @router.get("/google-places/{zipcode}")
 async def google_places_proxy(zipcode: int):
-    api_key = os.getenv("MY_API_KEY")
+    api_key = settings.MAPS_KEY
     zip_code_int = int(zipcode)
     url = f"https://maps.googleapis.com/maps/api/place/textsearch/json?query=restaurants+in+{zip_code_int}&key={api_key}"
 

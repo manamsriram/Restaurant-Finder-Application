@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../lib/api';
 
 const Login = ({ setShowLogin, setUser }) => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const Login = ({ setShowLogin, setUser }) => {
       formData.append('username', userData.email); // FastAPI expects 'username'
       formData.append('password', userData.password);
 
-      const response = await fetch("http://127.0.0.1:8000/auth/login", {
+      const response = await fetch(apiUrl('/auth/login'), {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -69,20 +70,22 @@ const Login = ({ setShowLogin, setUser }) => {
   return (
     <div className="w-full max-w-md">
       <form 
-        className='border border-black text-black p-4 rounded-md flex flex-col items-center gap-5' 
+        className='rf-card text-[#1f2421] p-6 rounded-2xl flex flex-col items-stretch gap-5 border border-black/5' 
         onSubmit={handleSubmit}
       >
-        <h1 className='text-xl font-bold'>LOG IN</h1>
+        <h1 className='text-3xl'>Welcome Back</h1>
+        <p className="text-sm text-[#5b6761] -mt-2">Sign in to review, save, and manage restaurant listings.</p>
         
         {error && (
-          <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className="mb-2 w-full p-2 bg-[#ffe9ed] border border-[#f3b2be] text-[#9c2339] rounded-lg">
             {error}
           </div>
         )}
 
-        <div className="mb-4">
+        <div className="mb-4 flex flex-col gap-2 w-full">
+          <label className="text-sm font-semibold text-[#3f4a45]">Email</label>
           <input
-            className='bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500'
+            className='bg-[#f8f4ec] appearance-none border border-[#e1d8ca] rounded-xl w-full py-2 px-4 text-[#1f2421] leading-tight focus:outline-none focus:border-[#167a72]'
             placeholder='Email'
             type="email"
             name="email"
@@ -92,9 +95,10 @@ const Login = ({ setShowLogin, setUser }) => {
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 flex flex-col gap-2 w-full">
+          <label className="text-sm font-semibold text-[#3f4a45]">Password</label>
           <input
-            className='bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500'
+            className='bg-[#f8f4ec] appearance-none border border-[#e1d8ca] rounded-xl w-full py-2 px-4 text-[#1f2421] leading-tight focus:outline-none focus:border-[#167a72]'
             placeholder='Password'
             type={showPassword ? 'text' : 'password'}
             name="password"
@@ -104,12 +108,12 @@ const Login = ({ setShowLogin, setUser }) => {
           />
         </div>
 
-        <label className="w-full flex items-center gap-2 mb-4 text-sm text-gray-600 cursor-pointer">
+        <label className="w-full flex items-center gap-2 mb-4 text-sm text-[#5b6761] cursor-pointer">
           <input
             type="checkbox"
             checked={showPassword}
             onChange={(e) => setShowPassword(e.target.checked)}
-            className="accent-green-500"
+            className="accent-[#167a72]"
           />
           Show Password
         </label>
@@ -117,7 +121,7 @@ const Login = ({ setShowLogin, setUser }) => {
         <div className="flex items-center justify-center">
           <button
             type="submit"
-            className='shadow bg-green-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded'
+            className='rf-btn rf-btn-primary'
           >
             Log In
           </button>

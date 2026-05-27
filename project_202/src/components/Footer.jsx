@@ -3,43 +3,43 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-gray-200 p-8 mt-auto">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="mt-auto text-[#f8f7f2] bg-[#1f2421] border-t border-white/10">
+      <div className="rf-page grid grid-cols-1 md:grid-cols-3 gap-8 py-10">
         
         {/* Restaurant Finder Description */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Restaurant Finder</h2>
-          <p className="text-gray-400">
-            Discover the best restaurants around you.
+          <h2 className="text-2xl mb-4">Restaurant Finder</h2>
+          <p className="text-[#b8c6bf] leading-relaxed">
+            Discover independent gems and local favorites with a smarter, faster city dining search.
           </p>
         </div>
         
         {/* Quick Links */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Quick Links</h2>
-          <ul>
-            <li><a href="#" className="hover:underline">About Us</a></li>
-            <li><a href="#" className="hover:underline">Contact</a></li>
-            <li><a href="#" className="hover:underline">Privacy Policy</a></li>
-            <li><a href="#" className="hover:underline">Term of Service</a></li>
+          <h2 className="text-2xl mb-4">Quick Links</h2>
+          <ul className="space-y-2 text-[#dce6e0]">
+            <li><a href="#" className="hover:text-[#f4a300]">About Us</a></li>
+            <li><a href="#" className="hover:text-[#f4a300]">Contact</a></li>
+            <li><a href="#" className="hover:text-[#f4a300]">Privacy Policy</a></li>
+            <li><a href="#" className="hover:text-[#f4a300]">Terms of Service</a></li>
           </ul>
         </div>
         
         {/* Newsletter Subscribe */}
         <div>
-        <h2 className="text-xl font-semibold mb-4">Subscribe to our Newsletter</h2>
+        <h2 className="text-2xl mb-4">Weekly Food Drop</h2>
         <form className="flex">
             <label htmlFor="newsletter-email" className="sr-only">Email</label>
             <input 
             id="newsletter-email"
             type="email" 
             placeholder="Your email" 
-            className="flex-grow p-2 text-gray-800 rounded-l-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="flex-grow p-2 text-[#1f2421] rounded-l-md border border-white/20 bg-[#fdf8ee] focus:outline-none"
             required
             />
             <button 
             type="submit" 
-            className="bg-blue-600 text-white p-2 rounded-r-md border-t border-b border-r border-blue-600 hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="bg-[#c7522a] text-white p-2 rounded-r-md border-t border-b border-r border-[#c7522a] hover:bg-[#de6f32] transition-colors"
             >
             Subscribe
             </button>
@@ -47,7 +47,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="mt-8 text-center text-gray-500">
+      <div className="py-5 border-t border-white/10 text-center text-[#94a49d]">
         &copy; {new Date().getFullYear()} Restaurant Finder. All rights reserved.
       </div>
     </footer>

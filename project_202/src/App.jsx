@@ -14,7 +14,7 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="rf-shell">
       <Header setSearchTerm={setSearchTerm} />
       <Routes>
         <Route path="/" element={<Body searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
@@ -42,7 +42,7 @@ const App = () => {
 
         <Route path="/restaurant/:rid" element={<RestaurantDetails />} />
         <Route path="*" element={
-          <div className="flex-grow flex items-center justify-center">
+          <div className="rf-page flex-grow flex items-center justify-center">
             <h1 className="text-2xl">404 - Page Not Found</h1>
           </div>
         } />
