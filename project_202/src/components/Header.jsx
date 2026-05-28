@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import Signup from './Signup';
 import Login from './Login';
 
 const Header = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isLanding = pathname === '/';
   const [showSignup, setShowSignup] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [user, setUser] = useState(() => {
@@ -41,7 +43,7 @@ const Header = () => {
   };
 
   return (
-    <HeaderShell className="rf-fade-up">
+    <HeaderShell className="rf-fade-up" $isLanding={isLanding}>
       <HeaderGlow />
       <TopBar className="rf-page">
         <BrandBlock to="/explore">
@@ -99,12 +101,17 @@ const Header = () => {
 };
 
 const HeaderShell = styled.header`
-  position: sticky;
+  position: ${({ $isLanding }) => $isLanding ? 'fixed' : 'sticky'};
   top: 0;
-  z-index: 30;
-  background: linear-gradient(110deg, rgba(31, 36, 33, 0.95), rgba(22, 122, 114, 0.86));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(12px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: ${({ $isLanding }) => $isLanding
+    ? 'transparent'
+    : 'linear-gradient(110deg, rgba(31, 36, 33, 0.95), rgba(22, 122, 114, 0.86))'};
+  border-bottom: ${({ $isLanding }) => $isLanding ? 'none' : '1px solid rgba(255, 255, 255, 0.18)'};
+  backdrop-filter: ${({ $isLanding }) => $isLanding ? 'none' : 'blur(12px)'};
+  transition: background 0.4s, border-bottom 0.4s;
 `;
 
 const HeaderGlow = styled.div`

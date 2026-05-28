@@ -6,8 +6,10 @@ import { apiUrl } from '../lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const FOOD_VIDEO_URL =
-  'https://videos.pexels.com/video-files/3195385/3195385-hd_1920_1080_30fps.mp4';
+const FOOD_VIDEO_URLS = [
+  'https://assets.mixkit.co/videos/4001/4001-720.mp4',
+  'https://assets.mixkit.co/videos/39647/39647-720.mp4',
+];
 
 const getPriceRange = (restaurant) => {
   if (restaurant.price_range) return restaurant.price_range;
@@ -45,6 +47,7 @@ const Landing = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [topRestaurants, setTopRestaurants] = useState([]);
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     fetch(apiUrl('/restaurants'), { headers: { Accept: 'application/json' } })
@@ -103,13 +106,18 @@ const Landing = () => {
     <div style={styles.page}>
       {/* ── HERO ── */}
       <section ref={heroRef} style={styles.hero}>
-        <video
-          autoPlay muted loop playsInline
-          style={styles.video}
-          onError={e => { e.target.style.display = 'none'; }}
-        >
-          <source src={FOOD_VIDEO_URL} type="video/mp4" />
-        </video>
+        {!videoError && (
+          <video
+            autoPlay muted loop playsInline
+            style={styles.video}
+            onError={() => setVideoError(true)}
+          >
+            {FOOD_VIDEO_URLS.map(url => (
+              <source key={url} src={url} type="video/mp4" />
+            ))}
+          </video>
+        )}
+        {videoError && <div style={styles.videoFallback} />}
 
         {/* warm color grade over video */}
         <div style={styles.videoOverlay} />
@@ -282,6 +290,13 @@ const styles = {
     height: '100%',
     objectFit: 'cover',
     opacity: 0.5,
+  },
+  videoFallback: {
+    position: 'absolute',
+    inset: 0,
+    background: 'linear-gradient(135deg, #2d1a08 0%, #1a1008 40%, #3d2010 70%, #1a1008 100%)',
+    backgroundSize: '400% 400%',
+    animation: 'gradientShift 12s ease infinite',
   },
   videoOverlay: {
     position: 'absolute',
