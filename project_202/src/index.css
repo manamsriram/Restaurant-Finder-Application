@@ -118,3 +118,8 @@ a {
 		width: calc(100% - 1rem);
 	}
 }
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(6px); }
+}
