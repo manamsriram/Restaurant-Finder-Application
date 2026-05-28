@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Signup from './Signup';
 import Login from './Login';
 
-const Header = ({ setSearchTerm }) => {
+const Header = () => {
+  const navigate = useNavigate();
   const [showSignup, setShowSignup] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [user, setUser] = useState(() => {
@@ -15,8 +16,8 @@ const Header = ({ setSearchTerm }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const searchValue = e.target.elements.search.value;
-    setSearchTerm(searchValue.trim());
+    const searchValue = e.target.elements.search.value.trim();
+    navigate(searchValue ? `/explore?q=${encodeURIComponent(searchValue)}` : '/explore');
   };
 
   const handleCloseModal = () => {
@@ -36,14 +37,14 @@ const Header = ({ setSearchTerm }) => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
     setUser(null);
-    window.location.href = '/';
+    window.location.href = '/explore';
   };
 
   return (
     <HeaderShell className="rf-fade-up">
       <HeaderGlow />
       <TopBar className="rf-page">
-        <BrandBlock to="/">
+        <BrandBlock to="/explore">
           <BrandEyebrow>RESTAURANT FINDER</BrandEyebrow>
           <BrandTitle>Taste The City</BrandTitle>
         </BrandBlock>
