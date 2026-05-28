@@ -6,9 +6,9 @@ const Footer = () => {
     <footer className="mt-auto text-[#f8f7f2] bg-[#1f2421] border-t border-white/10">
       <div className="rf-page grid grid-cols-1 md:grid-cols-3 gap-8 py-10">
         
-        {/* Restaurant Finder Description */}
+        {/* Relish Description */}
         <div>
-          <h2 className="text-2xl mb-4">Restaurant Finder</h2>
+          <h2 className="text-2xl mb-4">Relish</h2>
           <p className="text-[#b8c6bf] leading-relaxed">
             Discover independent gems and local favorites with a smarter, faster city dining search.
           </p>
@@ -48,7 +48,7 @@ const Footer = () => {
       </div>
 
       <div className="py-5 border-t border-white/10 text-center text-[#94a49d]">
-        &copy; {new Date().getFullYear()} Restaurant Finder. All rights reserved.
+        &copy; {new Date().getFullYear()} Relish. All rights reserved.
       </div>
     </footer>
   );

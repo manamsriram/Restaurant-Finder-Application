@@ -46,9 +46,9 @@ const Header = () => {
     <HeaderShell className="rf-fade-up" $isLanding={isLanding}>
       <HeaderGlow />
       <TopBar className="rf-page">
-        <BrandBlock to="/explore">
-          <BrandEyebrow>RESTAURANT FINDER</BrandEyebrow>
-          <BrandTitle>Taste The City</BrandTitle>
+        <BrandBlock to="/">
+          <BrandEyebrow>DISCOVER · DEVOUR</BrandEyebrow>
+          <BrandTitle>Relish</BrandTitle>
         </BrandBlock>
 
         <SearchForm onSubmit={handleSearch}>
