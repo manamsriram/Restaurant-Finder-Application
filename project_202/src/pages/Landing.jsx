@@ -57,6 +57,72 @@ const Landing = () => {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Initial text stagger on page load
+      gsap.from(
+        [eyebrowRef.current, titleRef.current, subtitleRef.current, ctaBtnRef.current, scrollIndicatorRef.current],
+        {
+          y: 40,
+          opacity: 0,
+          stagger: 0.18,
+          duration: 1.2,
+          ease: 'power3.out',
+          delay: 0.3,
+        }
+      );
+
+      // Pin hero for 150% scroll
+      ScrollTrigger.create({
+        trigger: heroRef.current,
+        start: 'top top',
+        end: '+=150%',
+        pin: true,
+        pinSpacing: true,
+      });
+
+      // Features cells stagger-in
+      gsap.from('.feature-cell', {
+        scrollTrigger: {
+          trigger: featuresRef.current,
+          start: 'top 70%',
+        },
+        y: 60,
+        opacity: 0,
+        stagger: 0.15,
+        duration: 0.9,
+        ease: 'power3.out',
+      });
+
+      // Preview cards stagger-in
+      gsap.from('.preview-card', {
+        scrollTrigger: {
+          trigger: previewRef.current,
+          start: 'top 75%',
+        },
+        y: 50,
+        opacity: 0,
+        stagger: 0.12,
+        duration: 0.8,
+        ease: 'power3.out',
+      });
+
+      // CTA section fade-in
+      gsap.from(ctaSectionRef.current, {
+        scrollTrigger: {
+          trigger: ctaSectionRef.current,
+          start: 'top 80%',
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+      });
+    });
+
+    return () => ctx.revert();
+  }, [topRestaurants]); // re-run after restaurants load so preview cards exist in DOM
+
   const handleSearch = (e) => {
     e.preventDefault();
     const q = searchQuery.trim();
