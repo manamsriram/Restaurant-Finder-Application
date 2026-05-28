@@ -64,7 +64,7 @@ const RestaurantCard = ({ restaurant }) => {
           <Rating isgood={ratingValue >= 4}>
             ★ {ratingValue.toFixed(1)}
           </Rating>
-          <PriceRange>{getPriceRange(restaurant.menu)}</PriceRange>
+          <PriceRange>{restaurant.price_range || getPriceRange(restaurant.menu)}</PriceRange>
           <Status isOpen={isCurrentlyOpen}>
             {isCurrentlyOpen ? 'Open' : 'Closed'}
           </Status>

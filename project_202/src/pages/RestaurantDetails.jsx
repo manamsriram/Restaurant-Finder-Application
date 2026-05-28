@@ -95,7 +95,7 @@ const RestaurantDetails = () => {
             <PhotoGrid>
             {restaurant.photos.map((photo, index) => (
                 <PhotoCard key={index}>
-                <RestaurantImage src={photo.image} alt={photo.description || 'Restaurant photo'} />
+                <RestaurantImage src={photo.url} alt="Restaurant photo" />
                 {photo.description && <PhotoCaption>{photo.description}</PhotoCaption>}
                 </PhotoCard>
             ))}

@@ -23,25 +23,40 @@ router = APIRouter(
 @router.get("/{restaurant_id}")
 def get_restaurant(restaurant_id: int, db: Session = Depends(get_db)):
     restaurant = db.query(models.Restaurant).filter(models.Restaurant.rid == restaurant_id).first()
-    return restaurant
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    photos = db.query(models.Photo).filter(models.Photo.rid == restaurant_id).all()
+    return {
+        "rid": restaurant.rid,
+        "name": restaurant.name,
+        "address": restaurant.address,
+        "city": restaurant.city,
+        "state": restaurant.state,
+        "zip_code": restaurant.zip_code,
+        "phone": restaurant.phone,
+        "website": restaurant.website,
+        "overall_rating": restaurant.overall_rating,
+        "price_range": restaurant.price_range,
+        "opentime": restaurant.opentime,
+        "closetime": restaurant.closetime,
+        "description": restaurant.description,
+        "status": restaurant.status,
+        "menu": restaurant.menu,
+        "photos": [{"pid": p.pid, "url": p.url} for p in photos],
+    }
 
 # fetch menu for a restaurant from database using restaurant_id
 @router.get("/{restaurant_id}/menu")
 def get_menu(restaurant_id: int, db: Session = Depends(get_db)):
-    # Retrieving the restaurant from the database
     restaurant = db.query(models.Restaurant).filter(models.Restaurant.rid == restaurant_id).first()
-
     if not restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
-
+    if not restaurant.menu:
+        return {}
     try:
-        # Parse the JSON string from the database
-        menu_json = json.loads(restaurant.menu)
+        return json.loads(restaurant.menu)
     except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="Failed to parse menu JSON")
-
-    # Return the menu as a JSON response
-    return menu_json
+        return {}
 
 # fetch reviews for a restaurant from database using restaurant_id
 @router.get("/{restaurant_id}/reviews")
@@ -53,9 +68,14 @@ def get_reviews(restaurant_id: int, db: Session = Depends(get_db)):
     
     return [
         {
-            **review[0].__dict__,
-            "username": review[1]
-        } for review in reviews
+            "rvid": review.rvid,
+            "rating": review.rating,
+            "comment": review.comment,
+            "rid": review.rid,
+            "uid": review.uid,
+            "created": review.created,
+            "username": username,
+        } for review, username in reviews
     ]
 
 
