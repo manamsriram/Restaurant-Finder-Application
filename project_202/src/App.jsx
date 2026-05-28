@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Body from './components/Body';
 import Footer from './components/Footer';
+import Landing from './pages/Landing';
 import Business from './pages/Business.jsx';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute.jsx';
 import AddNewResturant from './pages/AddNewRestaurant.jsx';
@@ -11,35 +12,24 @@ import RestaurantDetails from './pages/RestaurantDetails.jsx';
 import Admin from './pages/Admin.jsx';
 
 const App = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-
   return (
     <div className="rf-shell">
-      <Header setSearchTerm={setSearchTerm} />
+      <Header />
       <Routes>
-        <Route path="/" element={<Body searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/explore" element={<Body />} />
         <Route path="/business" element={
-          <ProtectedRoute>
-            <Business />
-          </ProtectedRoute>}
-        />
+          <ProtectedRoute><Business /></ProtectedRoute>
+        } />
         <Route path="/business/addNew" element={
-          <ProtectedRoute>
-            <AddNewResturant />
-          </ProtectedRoute>}
-        />
+          <ProtectedRoute><AddNewResturant /></ProtectedRoute>
+        } />
         <Route path="/edit/:rid" element={
-          <ProtectedRoute>
-            <EditResturantDetail />
-          </ProtectedRoute>}
-        />
-
+          <ProtectedRoute><EditResturantDetail /></ProtectedRoute>
+        } />
         <Route path="/admin" element={
-                <AdminRoute>
-                    <Admin />
-                </AdminRoute>
-            } />
-
+          <AdminRoute><Admin /></AdminRoute>
+        } />
         <Route path="/restaurant/:rid" element={<RestaurantDetails />} />
         <Route path="*" element={
           <div className="rf-page flex-grow flex items-center justify-center">
