@@ -21,21 +21,28 @@ def _resolve_database_url() -> str:
     return f"mysql+pymysql://{username}:{password}@{host}:{port}/{database_name}"
 
 
-SQLALCHEMY_DATABASE_URL = _resolve_database_url()
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False} if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {},
-    pool_pre_ping=True,
-)
-
-sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 Base = declarative_base()
+
+_engine = None
+_session_local = None
+
+
+def _get_engine():
+    global _engine, _session_local
+    if _engine is None:
+        url = _resolve_database_url()
+        _engine = create_engine(
+            url,
+            connect_args={"check_same_thread": False} if url.startswith("sqlite") else {},
+            pool_pre_ping=True,
+        )
+        _session_local = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
+    return _engine
 
 
 def get_db():
-    db = sessionLocal()
+    _get_engine()
+    db = _session_local()
     try:
         yield db
     finally:
