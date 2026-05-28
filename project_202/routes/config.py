@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     ALGORITHM: str = "HS256"
-    SECRET_KEY: str
+    SECRET_KEY: str = ""
     MAPS_KEY: str = ""
 
     # Comma-separated list, for example: https://app.vercel.app,https://www.app.com
