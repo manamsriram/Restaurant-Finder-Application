@@ -16,8 +16,14 @@ def _resolve_database_url() -> str:
     username = os.getenv("DB_USERNAME", "")
     password = os.getenv("DB_PASSWORD", "")
     host = os.getenv("DB_HOST", "")
-    port = os.getenv("DB_PORT", "")
+    port = os.getenv("DB_PORT", "3306")
     database_name = os.getenv("DB_NAME", "")
+
+    if not host or not database_name:
+        raise RuntimeError(
+            "No database configured. Set DATABASE_URL environment variable."
+        )
+
     return f"mysql+pymysql://{username}:{password}@{host}:{port}/{database_name}"
 
 

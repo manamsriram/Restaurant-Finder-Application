@@ -9,6 +9,8 @@ from config import settings
 app = FastAPI()
 
 cors_origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(',') if origin.strip()]
+if not cors_origins:
+    cors_origins = ['*']
 allow_all_origins = '*' in cors_origins
 
 app.add_middleware(
