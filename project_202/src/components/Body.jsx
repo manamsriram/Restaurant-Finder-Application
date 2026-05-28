@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiUrl } from '../lib/api';
 
 
@@ -77,7 +77,9 @@ const RestaurantCard = ({ restaurant }) => {
   );
 };
 
-const Body = ({ searchTerm, setSearchTerm }) => {
+const Body = () => {
+  const [searchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('q') || '');
   const [restaurants, setRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -246,6 +248,11 @@ const Body = ({ searchTerm, setSearchTerm }) => {
   
     setFilteredRestaurants(filtered);
   }, [searchTerm, filters, restaurants]);
+
+  useEffect(() => {
+    const q = searchParams.get('q') || '';
+    setSearchTerm(q);
+  }, [searchParams]);
 
   const handleFilterChange = (name, value) => {
     setFilters(prev => ({
