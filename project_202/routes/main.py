@@ -1,26 +1,10 @@
-from fastapi import FastAPI, HTTPException, Depends, Form
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from . import models
-from .db_config import get_db, Base, engine
-from datetime import datetime, timedelta
-import bcrypt
-import jwt
-from .models import User
-from passlib.context import CryptContext
-from dotenv import load_dotenv
-import os
-from sqlalchemy.exc import IntegrityError
-from fastapi import Request
-import json
+from .db_config import get_db
 from .routers import restaurants, users, auth, owners
 from .config import settings
-
-# Get the absolute path of the directory containing your script
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Construct path to .env file
-env_path = os.path.join(BASE_DIR, '.env')
-load_dotenv(dotenv_path=env_path)
 
 app = FastAPI()
 
@@ -29,14 +13,12 @@ allow_all_origins = '*' in cors_origins
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[] if allow_all_origins else cors_origins,
-    allow_origin_regex='.*' if allow_all_origins else None,
-    allow_credentials=True,
+    allow_origins=["*"] if allow_all_origins else cors_origins,
+    allow_credentials=False if allow_all_origins else True,
     allow_methods=['*'],
     allow_headers=['*'],
 )
 
-models.Base.metadata.create_all(bind=engine)
 app.include_router(restaurants.router)
 app.include_router(users.router)
 app.include_router(auth.router)
