@@ -47,7 +47,6 @@ const Landing = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [topRestaurants, setTopRestaurants] = useState([]);
-  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     fetch(apiUrl('/restaurants'), { headers: { Accept: 'application/json' } })
@@ -106,18 +105,13 @@ const Landing = () => {
     <div style={styles.page}>
       {/* ── HERO ── */}
       <section ref={heroRef} style={styles.hero}>
-        {!videoError && (
-          <video
-            autoPlay muted loop playsInline
-            style={styles.video}
-            onError={() => setVideoError(true)}
-          >
-            {FOOD_VIDEO_URLS.map(url => (
-              <source key={url} src={url} type="video/mp4" />
-            ))}
-          </video>
-        )}
-        {videoError && <div style={styles.videoFallback} />}
+        {/* gradient always visible — video layers on top if it loads */}
+        <div style={styles.videoFallback} />
+        <video autoPlay muted loop playsInline style={styles.video}>
+          {FOOD_VIDEO_URLS.map(url => (
+            <source key={url} src={url} type="video/mp4" />
+          ))}
+        </video>
 
         {/* warm color grade over video */}
         <div style={styles.videoOverlay} />

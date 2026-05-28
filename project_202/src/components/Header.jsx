@@ -108,8 +108,8 @@ const HeaderShell = styled.header`
   z-index: 100;
   background: ${({ $isLanding }) => $isLanding
     ? 'transparent'
-    : 'linear-gradient(110deg, rgba(31, 36, 33, 0.95), rgba(22, 122, 114, 0.86))'};
-  border-bottom: ${({ $isLanding }) => $isLanding ? 'none' : '1px solid rgba(255, 255, 255, 0.18)'};
+    : 'var(--header-bg)'};
+  border-bottom: ${({ $isLanding }) => $isLanding ? 'none' : '1px solid rgba(194, 122, 58, 0.18)'};
   backdrop-filter: ${({ $isLanding }) => $isLanding ? 'none' : 'blur(12px)'};
   transition: background 0.4s, border-bottom 0.4s;
 `;
@@ -118,8 +118,8 @@ const HeaderGlow = styled.div`
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 6% 30%, rgba(244, 163, 0, 0.24), transparent 35%),
-    radial-gradient(circle at 90% 50%, rgba(255, 255, 255, 0.14), transparent 40%);
+    radial-gradient(circle at 6% 50%, rgba(194, 122, 58, 0.28), transparent 35%),
+    radial-gradient(circle at 90% 50%, rgba(253, 246, 237, 0.06), transparent 40%);
   pointer-events: none;
 `;
 

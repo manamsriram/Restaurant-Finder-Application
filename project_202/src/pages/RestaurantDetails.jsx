@@ -311,8 +311,8 @@ const RestaurantHeader = styled.div`
   border-radius: 20px;
   color: #fff;
   background:
-    radial-gradient(circle at 8% 18%, rgba(244, 163, 0, 0.4), transparent 40%),
-    linear-gradient(130deg, #1f2421, #167a72);
+    radial-gradient(circle at 8% 18%, rgba(194, 122, 58, 0.35), transparent 40%),
+    var(--hero-gradient);
   box-shadow: 0 14px 36px rgba(31, 36, 33, 0.23);
   
   h1 {

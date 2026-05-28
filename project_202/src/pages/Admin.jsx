@@ -169,8 +169,8 @@ const AdminHero = styled.section`
   border-radius: 24px;
   color: #fff;
   background:
-    radial-gradient(circle at 8% 18%, rgba(244, 163, 0, 0.34), transparent 36%),
-    linear-gradient(125deg, #1f2421, #167a72);
+    radial-gradient(circle at 8% 18%, rgba(194, 122, 58, 0.35), transparent 36%),
+    var(--hero-gradient);
   box-shadow: 0 16px 40px rgba(31, 36, 33, 0.22);
   margin-bottom: 1rem;
 
