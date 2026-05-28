@@ -9,9 +9,9 @@ import pymysql.cursors
 import pymysql
 from sqlalchemy.orm import Session
 import googlemaps
-from .. import models, schemas, oauth2
-from ..db_config import get_db
-from ..config import settings
+import models, schemas, oauth2
+from db_config import get_db
+from config import settings
 
 # Create a router object
 router = APIRouter(

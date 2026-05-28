@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from . import models
-from .db_config import get_db
-from .routers import restaurants, users, auth, owners
-from .config import settings
+import models
+from db_config import get_db
+from routers import restaurants, users, auth, owners
+from config import settings
 
 app = FastAPI()
 
