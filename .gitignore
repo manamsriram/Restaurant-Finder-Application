@@ -101,3 +101,5 @@ htmlcov/
 
 # pyenv
 # .python-version
+project_202/routes/venv
+__pycache__
