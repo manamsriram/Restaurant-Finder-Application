@@ -1,4 +1,4 @@
-from routes import utils
+import utils
 
 
 def test_get_password_hash_and_verify_password_success():
