@@ -1,0 +1,10 @@
+#!/bin/sh
+'''exec' "/Users/nkonoandrew/Desktop/Fall 2024/CMPE 202/Restaurant/team-project-cmpe202-01-super_scrum_bros/project_202/routes/venv/bin/python3.12" "$0" "$@"
+' '''
+# -*- coding: utf-8 -*-
+import re
+import sys
+from dotenv.__main__ import cli
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(cli())
