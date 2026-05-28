@@ -107,10 +107,10 @@ const RestaurantDetails = () => {
 
       <MenuSection>
         <h2>Menu</h2>
-        {menu && typeof menu === 'object' && Object.keys(menu).length > 0 ? (
-            Object.entries(menu).map(([categoryName, category], index) => (
+        {menu && Array.isArray(menu) && menu.length > 0 ? (
+            menu.map((category, index) => (
                 <MenuCategory key={index}>
-                    <h3>{categoryName}</h3>
+                    <h3>{category.category}</h3>
                     {category.items && category.items.map((item, itemIndex) => (
                         <MenuItem key={itemIndex}>
                             <div>
