@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Signup from './Signup';
 import Login from './Login';
@@ -8,18 +8,34 @@ import Login from './Login';
 const Header = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isLanding = pathname === '/';
+  const isExplore = pathname === '/explore';
   const [showSignup, setShowSignup] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [searchValue, setSearchValue] = useState(() => isExplore ? searchParams.get('q') || '' : '');
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('user');
     return saved ? JSON.parse(saved) : null;
   });
 
+  useEffect(() => {
+    setSearchValue(isExplore ? searchParams.get('q') || '' : '');
+  }, [pathname]);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    if (isExplore) {
+      // Live-filter results on the Explore page as the user types
+      setSearchParams(value ? { q: value } : {}, { replace: true });
+    }
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
-    const searchValue = e.target.elements.search.value.trim();
-    navigate(searchValue ? `/explore?q=${encodeURIComponent(searchValue)}` : '/explore');
+    if (isExplore) return; // already live-filtering, no navigation needed
+    navigate(searchValue.trim() ? `/explore?q=${encodeURIComponent(searchValue.trim())}` : '/explore');
   };
 
   const handleCloseModal = () => {
@@ -57,6 +73,8 @@ const Header = () => {
             name="search"
             placeholder="Name, dish, or ZIP code"
             autoComplete="off"
+            value={searchValue}
+            onChange={handleSearchChange}
           />
           <SearchButton type="submit">Find</SearchButton>
         </SearchForm>

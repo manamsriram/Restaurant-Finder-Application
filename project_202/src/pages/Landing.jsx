@@ -53,7 +53,7 @@ const Landing = () => {
       .then(r => r.json())
       .then(data => {
         const sorted = [...(data.restaurants || [])]
-          .sort((a, b) => parseFloat(b.rating || 0) - parseFloat(a.rating || 0));
+          .sort((a, b) => parseFloat(b.rating ?? b.overall_rating ?? 0) - parseFloat(a.rating ?? a.overall_rating ?? 0));
         setTopRestaurants(sorted.slice(0, 3));
       })
       .catch(() => {});
@@ -221,7 +221,7 @@ const Landing = () => {
               <div style={styles.cardName}>{r.name}</div>
               <div style={styles.cardAddress}>{r.address}</div>
               <div style={styles.cardMeta}>
-                <span style={{ color: '#f0c060' }}>★ {Number(r.rating || 0).toFixed(1)}</span>
+                <span style={{ color: '#f0c060' }}>★ {Number(r.rating ?? r.overall_rating ?? 0).toFixed(1)}</span>
                 <span style={{ color: '#c27a3a' }}>{getPriceRange(r)}</span>
                 <span style={{ color: isOpenNow(r) ? '#4ade80' : 'rgba(253,246,237,0.3)' }}>
                   ● {isOpenNow(r) ? 'Open' : 'Closed'}

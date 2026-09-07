@@ -90,8 +90,8 @@ const Body = () => {
   const [apiResults, setApiResults] = useState([]);
   const [filters, setFilters] = useState({
     is_open: false,
-    min_price: '',
-    max_price: '',
+    min_price: 1,
+    max_price: 3,
     min_rating: 0,
     sort_by: 'rating',
   });
@@ -100,8 +100,8 @@ const Body = () => {
     // Clear all applied filters
     setFilters({
       is_open: false,
-      min_price: '',
-      max_price: '',
+      min_price: 1,
+      max_price: 3,
       min_rating: 0,
       sort_by: 'rating',
     });
@@ -231,12 +231,10 @@ const Body = () => {
     }
   
     // Price range filter (inclusive low-high window)
-    if (filters.min_price || filters.max_price) {
+    if (filters.min_price > 1 || filters.max_price < 3) {
       filtered = filtered.filter(restaurant => {
         const tier = PRICE_TIER[restaurant.price_range || getPriceRange(restaurant.menu)];
-        const min = filters.min_price ? PRICE_TIER[filters.min_price] : 1;
-        const max = filters.max_price ? PRICE_TIER[filters.max_price] : 3;
-        return tier >= min && tier <= max;
+        return tier >= filters.min_price && tier <= filters.max_price;
       });
     }
 
@@ -287,16 +285,6 @@ const Body = () => {
       {/* Filters Section */}
       <FiltersSection>
         <FilterGroup>
-          <label>Search:</label>
-          <input
-            type="text"
-            placeholder="Name, dish, or ZIP code"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </FilterGroup>
-
-        <FilterGroup>
           <label>
             <input
               type="checkbox"
@@ -308,29 +296,41 @@ const Body = () => {
         </FilterGroup>
 
         <FilterGroup>
-          <label>Min Price:</label>
-          <select
-            value={filters.min_price}
-            onChange={(e) => handleFilterChange('min_price', e.target.value)}
-          >
-            <option value="">Any</option>
-            <option value="$">$</option>
-            <option value="$$">$$</option>
-            <option value="$$$">$$$</option>
-          </select>
-        </FilterGroup>
-
-        <FilterGroup>
-          <label>Max Price:</label>
-          <select
-            value={filters.max_price}
-            onChange={(e) => handleFilterChange('max_price', e.target.value)}
-          >
-            <option value="">Any</option>
-            <option value="$">$</option>
-            <option value="$$">$$</option>
-            <option value="$$$">$$$</option>
-          </select>
+          <label>Price Range:</label>
+          <PriceSliderWrap>
+            <PriceSlider>
+              <PriceTrack />
+              <PriceTrackFill
+                style={{
+                  left: `${((filters.min_price - 1) / 2) * 100}%`,
+                  right: `${100 - ((filters.max_price - 1) / 2) * 100}%`,
+                }}
+              />
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="1"
+                value={filters.min_price}
+                onChange={(e) =>
+                  handleFilterChange('min_price', Math.min(Number(e.target.value), filters.max_price))
+                }
+              />
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="1"
+                value={filters.max_price}
+                onChange={(e) =>
+                  handleFilterChange('max_price', Math.max(Number(e.target.value), filters.min_price))
+                }
+              />
+            </PriceSlider>
+            <PriceTicks>
+              <span>$</span><span>$$</span><span>$$$</span>
+            </PriceTicks>
+          </PriceSliderWrap>
         </FilterGroup>
 
         <FilterGroup>
@@ -394,7 +394,7 @@ const Body = () => {
       )}
 
 
-      {(searchTerm || filters.is_open || filters.min_price || filters.max_price || filters.min_rating > 0) && (
+      {(searchTerm || filters.is_open || filters.min_price > 1 || filters.max_price < 3 || filters.min_rating > 0) && (
         <ResetButton onClick={resetSearch}>
           Back to All Restaurants
         </ResetButton>
@@ -586,6 +586,86 @@ const FilterGroup = styled.div`
       padding: 0.5rem;
     }
   }
+`;
+
+const PriceSliderWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+`;
+
+const PriceSlider = styled.div`
+  position: relative;
+  width: 140px;
+  height: 1.4rem;
+  display: flex;
+  align-items: center;
+
+  input[type="range"] {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0;
+    background: transparent;
+    pointer-events: none;
+    appearance: none;
+    -webkit-appearance: none;
+
+    &::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      pointer-events: auto;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--amber, #c7522a);
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(31, 36, 33, 0.35);
+    }
+
+    &::-moz-range-thumb {
+      pointer-events: auto;
+      width: 16px;
+      height: 16px;
+      border: none;
+      border-radius: 50%;
+      background: var(--amber, #c7522a);
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(31, 36, 33, 0.35);
+    }
+
+    &::-webkit-slider-runnable-track {
+      background: transparent;
+    }
+    &::-moz-range-track {
+      background: transparent;
+    }
+  }
+`;
+
+const PriceTrack = styled.div`
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: #d8d0c5;
+`;
+
+const PriceTrackFill = styled.div`
+  position: absolute;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--amber, #c7522a);
+`;
+
+const PriceTicks = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 140px;
+  color: #6d7973;
+  font-size: 0.75rem;
 `;
 
 const ResetButton = styled.button`
