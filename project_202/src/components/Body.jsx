@@ -4,6 +4,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiUrl } from '../lib/api';
 
 
+const PRICE_TIER = { '$': 1, '$$': 2, '$$$': 3 };
+
 const getPriceRange = (menu) => {
   try {
     const menuData = JSON.parse(menu);
@@ -88,7 +90,8 @@ const Body = () => {
   const [apiResults, setApiResults] = useState([]);
   const [filters, setFilters] = useState({
     is_open: false,
-    price_range: '',
+    min_price: '',
+    max_price: '',
     min_rating: 0,
     sort_by: 'rating',
   });
@@ -97,7 +100,8 @@ const Body = () => {
     // Clear all applied filters
     setFilters({
       is_open: false,
-      price_range: '',
+      min_price: '',
+      max_price: '',
       min_rating: 0,
       sort_by: 'rating',
     });
@@ -162,8 +166,8 @@ const Body = () => {
       const isZip = /^\d{5}$/.test(searchTerm);
       if (isZip) {
         setIsZipCode(true);
-        filtered = filtered.filter(restaurant => 
-          restaurant.zip === parseInt(searchTerm)
+        filtered = filtered.filter(restaurant =>
+          parseInt(restaurant.zip ?? restaurant.zip_code) === parseInt(searchTerm)
         );
         
         const fetchGooglePlaces = async () => {
@@ -226,24 +230,28 @@ const Body = () => {
       });
     }
   
-    // Price range filter
-    if (filters.price_range) {
+    // Price range filter (inclusive low-high window)
+    if (filters.min_price || filters.max_price) {
       filtered = filtered.filter(restaurant => {
-        const calculatedPrice = getPriceRange(restaurant.menu);
-        return calculatedPrice === filters.price_range;
+        const tier = PRICE_TIER[restaurant.price_range || getPriceRange(restaurant.menu)];
+        const min = filters.min_price ? PRICE_TIER[filters.min_price] : 1;
+        const max = filters.max_price ? PRICE_TIER[filters.max_price] : 3;
+        return tier >= min && tier <= max;
       });
     }
-  
+
     // Rating filter
     if (filters.min_rating > 0) {
-      filtered = filtered.filter(restaurant => 
-        parseFloat(restaurant.rating) >= filters.min_rating
+      filtered = filtered.filter(restaurant =>
+        parseFloat(restaurant.rating ?? restaurant.overall_rating ?? 0) >= filters.min_rating
       );
     }
-  
+
     // Sorting
     if (filters.sort_by === 'rating') {
-      filtered.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
+      filtered.sort((a, b) =>
+        parseFloat(b.rating ?? b.overall_rating ?? 0) - parseFloat(a.rating ?? a.overall_rating ?? 0)
+      );
     }
   
     setFilteredRestaurants(filtered);
@@ -279,6 +287,16 @@ const Body = () => {
       {/* Filters Section */}
       <FiltersSection>
         <FilterGroup>
+          <label>Search:</label>
+          <input
+            type="text"
+            placeholder="Name, dish, or ZIP code"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </FilterGroup>
+
+        <FilterGroup>
           <label>
             <input
               type="checkbox"
@@ -290,12 +308,25 @@ const Body = () => {
         </FilterGroup>
 
         <FilterGroup>
-          <label>Price Range:</label>
+          <label>Min Price:</label>
           <select
-            value={filters.price_range}
-            onChange={(e) => handleFilterChange('price_range', e.target.value)}
+            value={filters.min_price}
+            onChange={(e) => handleFilterChange('min_price', e.target.value)}
           >
-            <option value="">All</option>
+            <option value="">Any</option>
+            <option value="$">$</option>
+            <option value="$$">$$</option>
+            <option value="$$$">$$$</option>
+          </select>
+        </FilterGroup>
+
+        <FilterGroup>
+          <label>Max Price:</label>
+          <select
+            value={filters.max_price}
+            onChange={(e) => handleFilterChange('max_price', e.target.value)}
+          >
+            <option value="">Any</option>
             <option value="$">$</option>
             <option value="$$">$$</option>
             <option value="$$$">$$$</option>
@@ -363,7 +394,7 @@ const Body = () => {
       )}
 
 
-      {(searchTerm || filters.is_open || filters.price_range || filters.min_rating > 0) && (
+      {(searchTerm || filters.is_open || filters.min_price || filters.max_price || filters.min_rating > 0) && (
         <ResetButton onClick={resetSearch}>
           Back to All Restaurants
         </ResetButton>
